@@ -413,7 +413,7 @@ static void process_inst_str(char *inst_out, unsigned max_len,
     char const *pos;
     enum parse_state state = PARSE_STATE_NORM;
     unsigned out_idx = 0;
-    unsigned n_bits, scale;
+    unsigned n_bits = 0, scale;
 #define BUF_LEN 32
     char n_bits_str[BUF_LEN];
     char scale_str[BUF_LEN];

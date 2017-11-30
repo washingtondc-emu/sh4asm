@@ -79,7 +79,6 @@ static void clear_asm(void) {
  */
 bool test_inst(char const *inst) {
     size_t len = strlen(inst);
-    bool success = true;
 
     if (!len)
         errx(1, "empty instruction (this is a proble with the test)");
@@ -414,7 +413,6 @@ static void process_inst_str(char *inst_out, unsigned max_len,
     char const *pos;
     enum parse_state state = PARSE_STATE_NORM;
     unsigned out_idx = 0;
-    char const *open_bracket_pos, *comma_pos;
     unsigned n_bits, scale;
 #define BUF_LEN 32
     char n_bits_str[BUF_LEN];
@@ -432,7 +430,6 @@ static void process_inst_str(char *inst_out, unsigned max_len,
         case PARSE_STATE_NORM:
             if (*pos == '<') {
                 state = PARSE_STATE_N_BITS;
-                open_bracket_pos = pos;
                 memset(n_bits_str, 0, sizeof(n_bits_str));
                 n_bits_len = 0;
             } else if (*pos == '>') {
@@ -451,7 +448,6 @@ static void process_inst_str(char *inst_out, unsigned max_len,
             }
 
             if (*pos == ',') {
-                comma_pos = pos;
                 state = PARSE_STATE_SCALE;
                 memset(scale_str, 0, sizeof(scale_str));
                 scale_len = 0;

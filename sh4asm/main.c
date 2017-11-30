@@ -137,7 +137,6 @@ static void do_disasm(void) {
 
         drain:
             if (n_bytes == DAT_BUF_LEN) {
-                size_t idx = 0;
                 uint16_t dat16 = (dat_buf[0] & 0xff) |
                     ((dat_buf[1] & 0xff) << 8);
 
@@ -218,8 +217,4 @@ int main(int argc, char **argv) {
         fclose(file_out);
 
     return 0;
-}
-
-static void emit(struct tok const *tk) {
-    printf("tk->tp is %s\n", tok_as_str(tk));
 }

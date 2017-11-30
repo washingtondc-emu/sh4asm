@@ -8,7 +8,7 @@ enable_testing()
 
 # turn on strict warnings - i have no idea how to do this in windows
 if(UNIX)
-    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Werror")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror")
 endif()
 
 set(sh4asm_core_sources

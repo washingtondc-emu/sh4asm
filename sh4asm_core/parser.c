@@ -1424,7 +1424,6 @@ struct pattern {
 };
 
 static void push_token(struct tok const *tk);
-static void pop_token(struct tok *tk);
 static void process_line(void);
 static bool check_pattern(struct pattern const *ptrn);
 
@@ -1445,13 +1444,6 @@ static void push_token(struct tok const *tk) {
     if (n_tokens >= MAX_TOKENS)
         errx(1, "too many tokens");
     tokens[n_tokens++] = *tk;
-}
-
-static void pop_token(struct tok *tk) {
-    if (!n_tokens)
-        errx(1, "no more tokens");
-    *tk = tokens[n_tokens - 1];
-    n_tokens--;
 }
 
 static void process_line(void) {
@@ -1475,7 +1467,6 @@ static void process_line(void) {
 }
 
 static bool check_pattern(struct pattern const *ptrn) {
-    unsigned n_matched = 0;
     enum tok_tp const *cur_tok = ptrn->toks;
     unsigned tok_idx = 0;
 

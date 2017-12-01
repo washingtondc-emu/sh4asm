@@ -37,6 +37,8 @@
 #include "parser.h"
 #include "sh4asm.h"
 
+static sh4asm_error_func error_func;
+
 void sh4asm_set_emitter(sh4asm_emit_func emit) {
     parser_set_emitter(emit);
 }
@@ -48,4 +50,16 @@ void sh4asm_input_char(char ch) {
 void sh4asm_input_string(char const *txt) {
     while (*txt)
         sh4asm_input_char(*txt++);
+}
+
+void sh4asm_set_error_handler(sh4asm_error_func handler) {
+    error_func = handler;
+}
+
+__attribute__((__noreturn__)) void sh4asm_error(char const *fmt, ...) {
+    va_list arg;
+
+    va_start(arg, fmt);
+    error_func(fmt, arg);
+    va_end(arg);
 }

@@ -34,6 +34,9 @@
 #ifndef SH4ASM_H_
 #define SH4ASM_H_
 
+#include <stdint.h>
+#include <stdarg.h>
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -41,7 +44,12 @@ extern "C" {
 // this must match the signature of emit_bin_handler_func in sh4_bin_emit.h
 typedef void(*sh4asm_emit_func)(uint16_t);
 
+typedef void(*sh4asm_error_func)(char const*, va_list)
+    __attribute__((__noreturn__));
+
 void sh4asm_set_emitter(sh4asm_emit_func emit);
+void sh4asm_set_error_handler(sh4asm_error_func handler);
+void sh4asm_error(char const *fmt, ...) __attribute__((__noreturn__));
 void sh4asm_input_char(char ch);
 void sh4asm_input_string(char const *txt);
 

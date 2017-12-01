@@ -31,7 +31,6 @@
  *
  ******************************************************************************/
 
-#include <err.h>
 #include <errno.h>
 #include <stddef.h>
 #include <stdlib.h>
@@ -40,6 +39,7 @@
 #include <ctype.h>
 #include <stdio.h>
 
+#include "sh4asm.h"
 #include "lexer.h"
 
 static struct tok_mapping {
@@ -217,7 +217,7 @@ static struct tok_mapping const* check_tok(void) {
 
 void lexer_input_char(char ch, emit_tok_func emit) {
     if (tok_len >= (TOK_LEN_MAX - 1))
-        err(1, "Token is too long");
+        sh4asm_error("Token is too long");
 
     if (isspace(ch) || ch == ',' || ch == '@' || ch == '(' || ch == ')' ||
         ch == '\0' || ch == '\n' || ch == '+' || ch == '-') {
@@ -236,7 +236,7 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 errno = 0;
                 long val_as_long = strtol(cur_tok + 1, NULL, 0);
                 if (errno)
-                    err(1, "failed to decode integer literal");
+                    sh4asm_error("failed to decode integer literal");
                 struct tok tk = {
                     .tp = TOK_IMM,
                     .val = { .as_int = val_as_long }
@@ -246,7 +246,7 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 // general-purpose register
                 int reg_no = atoi(cur_tok + 1);
                 if (reg_no < 0 || reg_no > 15)
-                    errx(1, "invalid register index %d", reg_no);
+                    sh4asm_error("invalid register index %d", reg_no);
                 struct tok tk = {
                     .tp = TOK_RN,
                     .val = { .reg_idx = reg_no }
@@ -259,7 +259,7 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 // banked general-purpose register
                 int reg_no = atoi(cur_tok + 1);
                 if (reg_no < 0 || reg_no > 15)
-                    errx(1, "invalid banked register index %d", reg_no);
+                    sh4asm_error("invalid banked register index %d", reg_no);
                 struct tok tk = {
                     .tp = TOK_RN_BANK,
                     .val = { .reg_idx = reg_no }
@@ -270,7 +270,7 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 // floating-point register
                 int reg_no = atoi(cur_tok + 2);
                 if (reg_no < 0 || reg_no > 15)
-                    errx(1, "invalid floating-point register index %d",
+                    sh4asm_error("invalid floating-point register index %d",
                          reg_no);
                 struct tok tk = {
                     .tp = TOK_FRN,
@@ -282,7 +282,7 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 // double-precision floating-point register
                 int reg_no = atoi(cur_tok + 2);
                 if (reg_no < 0 || reg_no > 15 || (reg_no & 1))
-                    errx(1, "invalid double-precision floating-point "
+                    sh4asm_error("invalid double-precision floating-point "
                          "register index %d", reg_no);
                 struct tok tk = {
                     .tp = TOK_DRN,
@@ -294,7 +294,7 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 // double-precision floating-point register (banked-out)
                 int reg_no = atoi(cur_tok + 2);
                 if (reg_no < 0 || reg_no > 15 || (reg_no & 1))
-                    errx(1, "invalid banked double-precision floating-point "
+                    sh4asm_error("invalid banked double-precision floating-point "
                          "register index %d", reg_no);
                 struct tok tk = {
                     .tp = TOK_XDN,
@@ -306,7 +306,7 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 // floating-point vector register
                 int reg_no = atoi(cur_tok + 2);
                 if (reg_no < 0 || reg_no > 15 || (reg_no & 3))
-                    errx(1, "invalid floating-point vector register index "
+                    sh4asm_error("invalid floating-point vector register index "
                          "%d\n", reg_no);
                 struct tok tk = {
                     .tp = TOK_FVN,
@@ -322,7 +322,7 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 errno = 0;
                 long val_as_long = strtol(cur_tok, NULL, 0);
                 if (errno)
-                    errx(1, "unrecognized token \"%s\"", cur_tok);
+                    sh4asm_error("unrecognized token \"%s\"", cur_tok);
                 struct tok tk = {
                     .tp = TOK_DISP,
                     .val = { .as_int = val_as_long }

@@ -39,7 +39,9 @@
 #include <unistd.h>
 #include <stdint.h>
 #include <getopt.h>
+#include <stdarg.h>
 
+#include "sh4asm.h"
 #include "lexer.h"
 #include "parser.h"
 #include "disas.h"
@@ -55,6 +57,10 @@ static struct options {
     bool hex_comments;
     bool case_insensitive;
 } options;
+
+__attribute__((__noreturn__)) static void on_err(char const *fmt, va_list arg) {
+    verrx(1, fmt, arg);
+}
 
 static unsigned to_hex(char ch) {
     if (ch >= '0' && ch <= '9')
@@ -205,6 +211,8 @@ int main(int argc, char **argv) {
 
     if (options.filename_out)
         output = file_out = fopen(options.filename_out, "wb");
+
+    sh4asm_set_error_handler(on_err);
 
     if (options.disas)
         do_disasm();

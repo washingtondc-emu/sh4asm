@@ -31,11 +31,11 @@
  *
  ******************************************************************************/
 
-#include <err.h>
 #include <stdio.h>
 #include <stdbool.h>
 #include <stddef.h>
 
+#include "sh4asm.h"
 #include "parser.h"
 
 #define MAX_TOKENS 32
@@ -48,7 +48,7 @@ unsigned n_tokens;
 static void do_check(bool success, char const *cond, char const *func,
                      unsigned line, char const *file) {
     if (!success)
-        errx(1, "%s - sanity check failed: \"%s\" (line %d of %s)\n",
+        sh4asm_error("%s - sanity check failed: \"%s\" (line %d of %s)\n",
              func, cond, line, file);
 }
 
@@ -96,10 +96,10 @@ static void do_check_xdn(unsigned tok_idx, unsigned line, char const *file) {
     CHECK(tokens[tok_idx].tp == TOK_XDN);
     unsigned reg_idx = tokens[tok_idx].val.reg_idx;
     if (reg_idx >= 16)
-        errx(1, "invalid out-of-range banked double-precision floating-point "
+        sh4asm_error("invalid out-of-range banked double-precision floating-point "
              "register index %u (see line %d of %s)", reg_idx, line, file);
     if (reg_idx & 1)
-        errx(1, "invalid non-even banked double-precision floating-point "
+        sh4asm_error("invalid non-even banked double-precision floating-point "
              "register index %u (see line %d of %s)", reg_idx, line, file);
 }
 
@@ -107,10 +107,10 @@ static void do_check_fvn(unsigned tok_idx, unsigned line, char const *file) {
     CHECK(tokens[tok_idx].tp == TOK_FVN);
     unsigned reg_idx = tokens[tok_idx].val.reg_idx;
     if (reg_idx >= 16)
-        errx(1, "invalid out-of-range double-precision floating-point register "
+        sh4asm_error("invalid out-of-range double-precision floating-point register "
              "index %u (see line %d of %s)", reg_idx, line, file);
     if (reg_idx & 3)
-        errx(1, "invalid non-even double-precision floating-point register "
+        sh4asm_error("invalid non-even double-precision floating-point register "
              "index %u (see line %d of %s)", reg_idx, line, file);
 }
 
@@ -1442,7 +1442,7 @@ void parser_set_emitter(emit_bin_handler_func em) {
 
 static void push_token(struct tok const *tk) {
     if (n_tokens >= MAX_TOKENS)
-        errx(1, "too many tokens");
+        sh4asm_error("too many tokens");
     tokens[n_tokens++] = *tk;
 }
 
@@ -1463,7 +1463,7 @@ static void process_line(void) {
         printf("%s ", tok_as_str(tokens + tok_idx));
     puts("\n");
 
-    errx(1, "unrecognized pattern");
+    sh4asm_error("unrecognized pattern");
 }
 
 static bool check_pattern(struct pattern const *ptrn) {

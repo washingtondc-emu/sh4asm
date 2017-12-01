@@ -31,15 +31,24 @@
  *
  ******************************************************************************/
 
-#include <err.h>
+#include <stdio.h>
+#include <string.h>
 
 #include "sh4_asm_emit.h"
 
 #include "disas.h"
 
 static void opcode_non_inst(unsigned const *quads, disas_emit_func em) {
-    errx(1, "unimplemented behavior (.binary directive); see line %d of %s",
-         __LINE__, __FILE__);
+#define NON_INST_BUF_LEN 16
+    char buf[NON_INST_BUF_LEN];
+    memset(buf, 0, sizeof(buf));
+    // TODO: make sure the quads get printed in the right order
+    snprintf(buf, NON_INST_BUF_LEN, ".byte %x%x\n.byte %x%x\n",
+             quads[0], quads[1], quads[2], quads[3]);
+    buf[NON_INST_BUF_LEN - 1] = '\0';
+    char const *outp = buf;
+    while (*outp)
+        em(*outp++);
 }
 
 static void disas_0xx2(unsigned const *quads, disas_emit_func em) {

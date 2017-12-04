@@ -32,6 +32,9 @@
  ******************************************************************************/
 
 #include <stdio.h>
+#include <stdarg.h>
+#include <stdbool.h>
+#include <string.h>
 
 #include "lexer.h"
 #include "parser.h"
@@ -45,6 +48,94 @@ void sh4asm_set_emitter(sh4asm_emit_func emit) {
 
 void sh4asm_input_char(char ch) {
     lexer_input_char(ch, parser_input_token);
+}
+
+// preprocessor state
+enum pp_state {
+    // normal operation
+    PP_STATE_NORM,
+
+    // previous char was %-character
+    PP_STATE_PERCENT
+};
+
+static enum pp_state state = PP_STATE_NORM;
+
+static char const *unsigned_to_str(unsigned uval) {
+#define CONVBUF_LEN 16
+    static char buf[CONVBUF_LEN];
+    unsigned place = 1000000000;
+    unsigned idx = 0;
+    unsigned len = 0;
+    bool leading_zero = true;
+
+    // special case since the leading_zero won't return anything otherwise
+    if (!uval) {
+        buf[0] = '0';
+        buf[1] = '\0';
+        return buf;
+    }
+
+    memset(buf, 0, sizeof(buf));
+
+    while (place && idx < (CONVBUF_LEN - 1)) {
+        unsigned digit = uval / place;
+        if (leading_zero && digit == 0) {
+            place /= 10;
+            continue;
+        } else {
+            leading_zero = false;
+        }
+
+        buf[idx++] = digit + '0';
+        uval = place % uval;
+        place /= 10;
+        len++;
+    }
+
+    return buf;
+}
+
+void sh4asm_printf(char const *fmt, ...) {
+    char ch;
+    va_list arg;
+    unsigned uval;
+    char const *txtp;
+
+    va_start(arg, fmt);
+
+    while ((ch = *fmt++)) {
+        switch (state) {
+        case PP_STATE_NORM:
+            if (ch == '%')
+                state = PP_STATE_PERCENT;
+            else
+                lexer_input_char(ch, parser_input_token);
+            break;
+        case PP_STATE_PERCENT:
+            switch (ch) {
+            case '%':
+                lexer_input_char('%', parser_input_token);
+                break;
+            case 'u':
+                uval = va_arg(arg, unsigned);
+                txtp = unsigned_to_str(uval);
+                while (*txtp)
+                    lexer_input_char(*txtp++, parser_input_token);
+                break;
+            default:
+                printf("ERROR: only the %-character is allowed for printf-style "
+                       "substitutions\n");
+            }
+            state = PP_STATE_NORM;
+            break;
+        default:
+            // this ought to be impossible
+            printf("error - %s - state is %d\n", __func__, state);
+            break;
+        }
+    }
+    va_end(arg);
 }
 
 void sh4asm_input_string(char const *txt) {
@@ -65,6 +156,7 @@ __attribute__((__noreturn__)) void sh4asm_error(char const *fmt, ...) {
 }
 
 void sh4asm_reset(void) {
+    state = PP_STATE_NORM;
     parser_reset();
     lexer_reset();
 }

@@ -54,6 +54,10 @@ void sh4asm_error(char const *fmt, ...) __attribute__((__noreturn__));
 void sh4asm_input_char(char ch);
 void sh4asm_input_string(char const *txt);
 
+// assembly with printf-style substitutions.  Only the %u substitution pattern
+// is supported at this time.
+void sh4asm_printf(char const *fmt, ...);
+
 #ifdef __cplusplus
 }
 #endif

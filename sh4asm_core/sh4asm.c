@@ -124,7 +124,7 @@ void sh4asm_printf(char const *fmt, ...) {
                     lexer_input_char(*txtp++, parser_input_token);
                 break;
             default:
-                printf("ERROR: only the %-character is allowed for printf-style "
+                printf("ERROR: only the %%-character is allowed for printf-style "
                        "substitutions\n");
             }
             state = PP_STATE_NORM;

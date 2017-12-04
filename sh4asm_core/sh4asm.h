@@ -47,6 +47,7 @@ typedef void(*sh4asm_emit_func)(uint16_t);
 typedef void(*sh4asm_error_func)(char const*, va_list)
     __attribute__((__noreturn__));
 
+void sh4asm_reset(void);
 void sh4asm_set_emitter(sh4asm_emit_func emit);
 void sh4asm_set_error_handler(sh4asm_error_func handler);
 void sh4asm_error(char const *fmt, ...) __attribute__((__noreturn__));

@@ -63,3 +63,8 @@ __attribute__((__noreturn__)) void sh4asm_error(char const *fmt, ...) {
     error_func(fmt, arg);
     va_end(arg);
 }
+
+void sh4asm_reset(void) {
+    parser_reset();
+    lexer_reset();
+}

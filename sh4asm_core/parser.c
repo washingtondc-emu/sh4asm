@@ -39,8 +39,8 @@
 #include "parser.h"
 
 #define MAX_TOKENS 32
-struct tok tokens[MAX_TOKENS];
-unsigned n_tokens;
+static struct tok tokens[MAX_TOKENS];
+static unsigned n_tokens;
 
 #define CHECK_(cond, func, line, file) do_check((cond), #cond, func, line, file)
 #define CHECK(cond) CHECK_((cond), __func__, __LINE__, __FILE__)
@@ -1479,4 +1479,8 @@ static bool check_pattern(struct pattern const *ptrn) {
     }
 
     return (*cur_tok == TOK_NEWLINE) && (tok_idx == n_tokens);
+}
+
+void parser_reset(void) {
+    n_tokens = 0;
 }

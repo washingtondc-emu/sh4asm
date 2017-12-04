@@ -200,7 +200,7 @@ static struct tok_mapping {
 };
 #define TOK_LEN_MAX 32
 static char cur_tok[TOK_LEN_MAX];
-unsigned tok_len;
+static unsigned tok_len;
 
 static struct tok_mapping const* check_tok(void) {
     struct tok_mapping const *curs = tok_map;
@@ -420,4 +420,8 @@ char const *tok_as_str(struct tok const *tk) {
     }
 
     return NULL;
+}
+
+void lexer_reset(void) {
+    tok_len = 0;
 }

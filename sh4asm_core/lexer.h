@@ -230,4 +230,7 @@ void lexer_input_char(char ch, emit_tok_func emit);
  */
 char const *tok_as_str(struct tok const *tk);
 
+// reset the lexer to its default state
+void lexer_reset(void);
+
 #endif

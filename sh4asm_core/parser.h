@@ -37,6 +37,9 @@
 #include "lexer.h"
 #include "sh4_bin_emit.h"
 
+// reset the parser to its default state
+void parser_reset(void);
+
 void parser_input_token(struct tok const *tk);
 
 void parser_set_emitter(emit_bin_handler_func em);

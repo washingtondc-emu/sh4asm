@@ -88,7 +88,7 @@ static char const *unsigned_to_str(unsigned uval) {
         }
 
         buf[idx++] = digit + '0';
-        uval = place % uval;
+        uval -= digit * place;
         place /= 10;
         len++;
     }

@@ -93,7 +93,7 @@ bool test_inst(char const *inst) {
     clear_bin();
     sh4asm_set_emitter(neo_bin_emit);
     while (*inst)
-        sh4asm_input_char(tolower(*inst++));
+        sh4asm_input_char((char)tolower(*inst++));
     if (sh4asm_buf_len != 1) {
         printf("invalid sh4asm output length (expected 1, got %u)\n",
                sh4asm_buf_len);
@@ -417,8 +417,8 @@ static void process_inst_str(char *inst_out, unsigned max_len,
 #define BUF_LEN 32
     char n_bits_str[BUF_LEN];
     char scale_str[BUF_LEN];
-    unsigned n_bits_len;
-    unsigned scale_len;
+    unsigned n_bits_len = 0;
+    unsigned scale_len = 0;
 
     /*
      * instruction template format:
@@ -458,7 +458,7 @@ static void process_inst_str(char *inst_out, unsigned max_len,
                 unsigned val = rand() & masks[n_bits];
                 int n_chars = snprintf(inst_out + out_idx,
                                        max_len - out_idx, "%u", val);
-                if (n_chars >= (max_len - out_idx))
+                if ((unsigned)n_chars >= (max_len - out_idx))
                     errx(1, "buffer overflow in %s", __func__);
                 out_idx += n_chars;
             } else if (isdigit(*pos)) {
@@ -477,7 +477,7 @@ static void process_inst_str(char *inst_out, unsigned max_len,
                 unsigned val = (rand() & masks[n_bits]) * scale;
                 int n_chars = snprintf(inst_out + out_idx,
                                        max_len - out_idx, "%u", val);
-                if (n_chars >= (max_len - out_idx))
+                if ((unsigned)n_chars >= (max_len - out_idx))
                     errx(1, "buffer overflow in %s", __func__);
                 out_idx += n_chars;
             } else if (isdigit(*pos)) {
@@ -528,7 +528,7 @@ int test_all_insts(unsigned seed) {
 }
 
 int main(int argc, char **argv) {
-    unsigned int seed = time(NULL);
+    unsigned int seed = (unsigned int)time(NULL);
     int opt;
 
     while ((opt = getopt(argc, argv, "s:")) > 0) {

@@ -1127,12 +1127,20 @@ void disas_fxxx(unsigned const *quads, disas_emit_func em) {
 }
 
 void disas_inst(uint16_t inst, disas_emit_func em) {
+#ifdef _MSC_VER
+// C4204 nonstandard extension used: non-constant aggregate initializer
+#pragma warning(disable: 4204)
+#endif
     unsigned const quads[4] = {
         inst & 0xf,
         (inst & 0x00f0) >> 4,
         (inst & 0x0f00) >> 8,
         (inst & 0xf000) >> 12
     };
+#ifdef _MSC_VER
+#pragma warning(default: 4204)
+#endif
+
     switch (quads[3]) {
     case 0:
         disas_0xxx(quads, em);

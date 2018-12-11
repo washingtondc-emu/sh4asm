@@ -84,7 +84,7 @@ uint16_t assemble_bin_drm_drn(uint16_t opcode, unsigned drm, unsigned drn) {
 
 uint16_t assemble_bin_rm_drn(uint16_t opcode, unsigned rm, unsigned drn) {
     drn = (drn >> 1) & 7;
-    return opcode | (uint16_t)((rm & 15) << 4) | (unsigned)(drn << 9);
+    return opcode | (uint16_t)((rm & 15) << 4) | (uint16_t)(drn << 9);
 }
 
 uint16_t assemble_bin_drm_rn(uint16_t opcode, unsigned drm, unsigned rn) {

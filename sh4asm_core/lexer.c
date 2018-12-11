@@ -221,6 +221,10 @@ void lexer_input_char(char ch, emit_tok_func emit) {
 
     if (isspace(ch) || ch == ',' || ch == '@' || ch == '(' || ch == ')' ||
         ch == '\0' || ch == '\n' || ch == '+' || ch == '-') {
+#ifdef _MSC_VER
+// C4204 nonstandard extension used: non-constant aggregate initializer
+#pragma warning(disable: 4204)
+#endif
         if (tok_len) {
             cur_tok[tok_len] = '\0';
 
@@ -370,6 +374,9 @@ void lexer_input_char(char ch, emit_tok_func emit) {
             };
             emit(&tk);
         }
+#ifdef _MSC_VER
+#pragma warning(default: 4204)
+#endif
     } else {
         cur_tok[tok_len++] = ch;
     }

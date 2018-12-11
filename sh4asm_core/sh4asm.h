@@ -44,13 +44,23 @@ extern "C" {
 // this must match the signature of emit_bin_handler_func in sh4_bin_emit.h
 typedef void(*sh4asm_emit_func)(uint16_t);
 
+#ifdef _MSC_VER
+typedef void(*sh4asm_error_func)(char const*, va_list);
+#else
 typedef void(*sh4asm_error_func)(char const*, va_list)
     __attribute__((__noreturn__));
+#endif
 
 void sh4asm_reset(void);
 void sh4asm_set_emitter(sh4asm_emit_func emit);
 void sh4asm_set_error_handler(sh4asm_error_func handler);
-void sh4asm_error(char const *fmt, ...) __attribute__((__noreturn__));
+#ifdef _MSC_VER
+__declspec(noreturn)
+#else
+__attribute__((__noreturn__))
+#endif
+void sh4asm_error(char const *fmt, ...);
+
 void sh4asm_input_char(char ch);
 void sh4asm_input_string(char const *txt);
 

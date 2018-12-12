@@ -87,7 +87,7 @@ static char const *unsigned_to_str(unsigned uval) {
             leading_zero = false;
         }
 
-        buf[idx++] = digit + '0';
+        buf[idx++] = (char)digit + '0';
         uval -= digit * place;
         place /= 10;
         len++;
@@ -104,7 +104,7 @@ void sh4asm_printf(char const *fmt, ...) {
 
     va_start(arg, fmt);
 
-    while ((ch = *fmt++)) {
+    while ((ch = *fmt++) != '\0') {
         switch (state) {
         case PP_STATE_NORM:
             if (ch == '%')
@@ -147,7 +147,12 @@ void sh4asm_set_error_handler(sh4asm_error_func handler) {
     error_func = handler;
 }
 
-__attribute__((__noreturn__)) void sh4asm_error(char const *fmt, ...) {
+#ifdef _MSC_VER
+__declspec(noreturn)
+#else
+__attribute__((__noreturn__))
+#endif
+void sh4asm_error(char const *fmt, ...) {
     va_list arg;
 
     va_start(arg, fmt);

@@ -36,7 +36,9 @@
 #include <ctype.h>
 #include <string.h>
 #include <stdbool.h>
+#ifndef _MSC_VER
 #include <unistd.h>
+#endif
 #include <stdint.h>
 #include <getopt.h>
 #include <stdarg.h>
@@ -58,7 +60,12 @@ static struct options {
     bool case_insensitive;
 } options;
 
-__attribute__((__noreturn__)) static void on_err(char const *fmt, va_list arg) {
+#ifdef _MSC_VER
+__declspec(noreturn)
+#else
+__attribute__((__noreturn__))
+#endif
+static void on_err(char const *fmt, va_list arg) {
     verrx(1, fmt, arg);
 }
 
@@ -94,7 +101,7 @@ static void do_asm(void) {
     while ((ch = fgetc(input)) != EOF) {
         if (options.case_insensitive)
             ch = tolower(ch);
-        lexer_input_char(ch, parser_input_token);
+        lexer_input_char((char)ch, parser_input_token);
     }
 }
 
@@ -121,7 +128,7 @@ static void do_disasm(void) {
         int ch;
 #define DAT_BUF_LEN 2
         int dat_buf[DAT_BUF_LEN];
-        int dat;
+        int dat = 0;
         int n_bytes = 0;
         while ((ch = fgetc(input)) != EOF) {
 
@@ -133,9 +140,9 @@ static void do_disasm(void) {
             }
 
             if (even) {
-                dat = to_hex(ch);
+                dat = to_hex((char)ch);
             } else {
-                dat = (dat << 4) | to_hex(ch);
+                dat = (dat << 4) | to_hex((char)ch);
                 dat_buf[n_bytes++] = dat;
             }
 
@@ -206,11 +213,18 @@ int main(int argc, char **argv) {
         return 1;
     }
 
+#ifdef _MSC_VER
+// C4996 'fopen': This function or variable may be unsafe. Consider using fopen_s instead.
+#pragma warning(disable: 4996)
+#endif
     if (options.filename_in)
         input = file_in = fopen(options.filename_in, "rb");
 
     if (options.filename_out)
         output = file_out = fopen(options.filename_out, "wb");
+#ifdef _MSC_VER
+#pragma warning(default: 4996)
+#endif
 
     sh4asm_set_error_handler(on_err);
 

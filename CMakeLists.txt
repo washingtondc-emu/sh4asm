@@ -22,7 +22,6 @@ set(sh4asm_core_sources
     "sh4asm_core/parser.h"
     "sh4asm_core/sh4asm.h"
     "sh4asm_core/sh4asm.c"
-    "sh4asm_core/disas.c"
     "sh4asm_core/disas.h")
 
 include_directories("${PROJECT_SOURCE_DIR}/sh4asm_core")

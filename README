@@ -9,7 +9,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 
                         sh4asm SuperH-4 assembler/emitter
-                          Copyright 2017, snickerbockers
+                          Copyright 2017, 2019 snickerbockers
 
 sh4asm is an assembler/disassembler/emitter framework for the SuperH-4
 instruction set.  It's designed and tested with SEGA Dreamcast homebrew in

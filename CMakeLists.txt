@@ -6,9 +6,8 @@ set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -std=c11")
 
 enable_testing()
 
-# turn on strict warnings - i have no idea how to do this in windows
 if(UNIX)
-    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall -Werror")
+    set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -Wall")
 endif()
 
 set(sh4asm_core_sources

@@ -2,7 +2,7 @@
  *
  *
  *    WashingtonDC Dreamcast Emulator
- *    Copyright (C) 2016, 2017 snickerbockers
+ *    Copyright (C) 2016, 2017, 2019 snickerbockers
  *
  *    This program is free software: you can redistribute it and/or modify
  *    it under the terms of the GNU General Public License as published by
@@ -103,7 +103,7 @@ bool test_inst(char const *inst) {
 
     // now disassemble it
     clear_asm();
-    disas_inst(inst_bin, neo_asm_emit);
+    sh4asm_disas_inst(inst_bin, neo_asm_emit);
 
     // add in a newline
     neo_asm_emit('\n');

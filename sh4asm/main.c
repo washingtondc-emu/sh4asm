@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2017, snickerbockers <chimerasaurusrex@gmail.com>
+ * Copyright (c) 2017, 2019 snickerbockers <chimerasaurusrex@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -110,7 +110,7 @@ static void do_disasm(void) {
         while (fread(&dat, sizeof(dat), 1, input) == 1) {
             if (options.print_addrs)
                 fprintf(output, "%08x:    ", pc);
-            disas_inst(dat, do_emit_asm);
+            sh4asm_disas_inst(dat, do_emit_asm);
             pc += 2;
             if (options.hex_comments)
                 fprintf(output, " ! 0x%04x", (unsigned)dat);
@@ -148,7 +148,7 @@ static void do_disasm(void) {
 
                 if (options.print_addrs)
                     fprintf(output, "%08x:    ", pc);
-                disas_inst(dat16, do_emit_asm);
+                sh4asm_disas_inst(dat16, do_emit_asm);
                 pc += 2;
                 if (options.hex_comments)
                     fprintf(output, " ! 0x%04x", (unsigned)dat16);

@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2017, snickerbockers <chimerasaurusrex@gmail.com>
+ * Copyright (c) 2017, 2019 snickerbockers <chimerasaurusrex@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,7 +33,7 @@
 
 #include "sh4_asm_emit.h"
 
-void emit_str(asm_emit_handler_func em, char const *txt) {
+void emit_str(sh4asm_txt_emit_handler_func em, char const *txt) {
     while (*txt)
         em(*txt++);
 }

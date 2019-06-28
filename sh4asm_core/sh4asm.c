@@ -43,11 +43,11 @@
 static sh4asm_error_func error_func;
 
 void sh4asm_set_emitter(sh4asm_emit_func emit) {
-    parser_set_emitter(emit);
+    sh4asm_parser_set_emitter(emit);
 }
 
 void sh4asm_input_char(char ch) {
-    sh4asm_lexer_input_char(ch, parser_input_token);
+    sh4asm_lexer_input_char(ch, sh4asm_parser_input_token);
 }
 
 // preprocessor state
@@ -110,18 +110,18 @@ void sh4asm_printf(char const *fmt, ...) {
             if (ch == '%')
                 state = PP_STATE_PERCENT;
             else
-                sh4asm_lexer_input_char(ch, parser_input_token);
+                sh4asm_lexer_input_char(ch, sh4asm_parser_input_token);
             break;
         case PP_STATE_PERCENT:
             switch (ch) {
             case '%':
-                sh4asm_lexer_input_char('%', parser_input_token);
+                sh4asm_lexer_input_char('%', sh4asm_parser_input_token);
                 break;
             case 'u':
                 uval = va_arg(arg, unsigned);
                 txtp = unsigned_to_str(uval);
                 while (*txtp)
-                    sh4asm_lexer_input_char(*txtp++, parser_input_token);
+                    sh4asm_lexer_input_char(*txtp++, sh4asm_parser_input_token);
                 break;
             default:
                 printf("ERROR: only the %%-character is allowed for printf-style "
@@ -157,6 +157,6 @@ __attribute__((__noreturn__)) void sh4asm_error(char const *fmt, ...) {
 
 void sh4asm_reset(void) {
     state = PP_STATE_NORM;
-    parser_reset();
+    sh4asm_parser_reset();
     sh4asm_lexer_reset();
 }

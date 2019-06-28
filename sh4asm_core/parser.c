@@ -1427,7 +1427,7 @@ static void push_token(struct sh4asm_tok const *tk);
 static void process_line(void);
 static bool check_pattern(struct pattern const *ptrn);
 
-void parser_input_token(struct sh4asm_tok const *tk) {
+void sh4asm_parser_input_token(struct sh4asm_tok const *tk) {
     if (tk->tp == SH4ASM_TOK_NEWLINE) {
         process_line();
         n_tokens = 0;
@@ -1436,7 +1436,7 @@ void parser_input_token(struct sh4asm_tok const *tk) {
     }
 }
 
-void parser_set_emitter(sh4asm_bin_emit_handler_func em) {
+void sh4asm_parser_set_emitter(sh4asm_bin_emit_handler_func em) {
     emit = em;
 }
 
@@ -1481,6 +1481,6 @@ static bool check_pattern(struct pattern const *ptrn) {
     return (*cur_tok == SH4ASM_TOK_NEWLINE) && (tok_idx == n_tokens);
 }
 
-void parser_reset(void) {
+void sh4asm_parser_reset(void) {
     n_tokens = 0;
 }

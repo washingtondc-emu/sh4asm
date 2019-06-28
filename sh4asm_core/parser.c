@@ -39,7 +39,7 @@
 #include "parser.h"
 
 #define MAX_TOKENS 32
-static struct tok tokens[MAX_TOKENS];
+static struct sh4asm_tok tokens[MAX_TOKENS];
 static unsigned n_tokens;
 
 #define CHECK_(cond, func, line, file) do_check((cond), #cond, func, line, file)
@@ -53,20 +53,20 @@ static void do_check(bool success, char const *cond, char const *func,
 }
 
 #define CHECK_RN_(tok_idx, func, line, file)                    \
-    CHECK_(tokens[(tok_idx)].tp == TOK_RN, func, line, file)
+    CHECK_(tokens[(tok_idx)].tp == SH4ASM_TOK_RN, func, line, file)
 #define CHECK_RN(tok_idx) CHECK_RN_(tok_idx, __func__, __LINE__, __FILE__)
-#define CHECK_RN_BANK(tok_idx) CHECK_(tokens[(tok_idx)].tp == TOK_RN_BANK, \
+#define CHECK_RN_BANK(tok_idx) CHECK_(tokens[(tok_idx)].tp == SH4ASM_TOK_RN_BANK, \
                                       __func__, __LINE__, __FILE__)
 #define CHECK_FRN(tok_idx) CHECK_FRN_(tok_idx, __func__, __LINE__, __FILE__)
 #define CHECK_FRN_(tok_idx, func, line, file)                           \
-    CHECK_(tokens[(tok_idx)].tp == TOK_FRN, func, line, file)
+    CHECK_(tokens[(tok_idx)].tp == SH4ASM_TOK_FRN, func, line, file)
 #define CHECK_DRN(tok_idx) CHECK_DRN_((tok_idx), __func__, __LINE__, __FILE__)
 #define CHECK_DRN_(tok_idx, func, line, file) do_check_drn((tok_idx), func, line, file)
 #define CHECK_XDN(tok_idx) do_check_xdn((tok_idx), __LINE__, __FILE__)
 #define CHECK_FVN(tok_idx) do_check_fvn((tok_idx), __LINE__, __FILE__)
-#define CHECK_IMM(tok_idx) CHECK_(tokens[(tok_idx)].tp == TOK_IMM,  \
+#define CHECK_IMM(tok_idx) CHECK_(tokens[(tok_idx)].tp == SH4ASM_TOK_IMM,  \
                                   __func__, __LINE__, __FILE__)
-#define CHECK_DISP(tok_idx) CHECK_(tokens[(tok_idx)].tp == TOK_DISP,    \
+#define CHECK_DISP(tok_idx) CHECK_(tokens[(tok_idx)].tp == SH4ASM_TOK_DISP,    \
                                    __func__, __LINE__, __FILE__)
 
 #define CHECK_R0(tok_idx) do_check_r0((tok_idx), __func__, __LINE__, __FILE__)
@@ -86,14 +86,14 @@ static void do_check_fr0(unsigned tok_idx, char const *func,
 
 static void do_check_drn(unsigned tok_idx, char const *func,
                          unsigned line, char const *file) {
-    CHECK_(tokens[tok_idx].tp == TOK_DRN, func, line, file);
+    CHECK_(tokens[tok_idx].tp == SH4ASM_TOK_DRN, func, line, file);
     unsigned reg_idx = tokens[tok_idx].val.reg_idx;
     CHECK_(reg_idx < 16, func, line, file);
     CHECK_(!(reg_idx & 1), func, line, file);
 }
 
 static void do_check_xdn(unsigned tok_idx, unsigned line, char const *file) {
-    CHECK(tokens[tok_idx].tp == TOK_XDN);
+    CHECK(tokens[tok_idx].tp == SH4ASM_TOK_XDN);
     unsigned reg_idx = tokens[tok_idx].val.reg_idx;
     if (reg_idx >= 16)
         sh4asm_error("invalid out-of-range banked double-precision floating-point "
@@ -104,7 +104,7 @@ static void do_check_xdn(unsigned tok_idx, unsigned line, char const *file) {
 }
 
 static void do_check_fvn(unsigned tok_idx, unsigned line, char const *file) {
-    CHECK(tokens[tok_idx].tp == TOK_FVN);
+    CHECK(tokens[tok_idx].tp == SH4ASM_TOK_FVN);
     unsigned reg_idx = tokens[tok_idx].val.reg_idx;
     if (reg_idx >= 16)
         sh4asm_error("invalid out-of-range double-precision floating-point register "
@@ -992,443 +992,443 @@ struct pattern {
     enum tok_tp toks[MAX_TOKENS];
 } const tok_ptrns[] = {
     // opcodes which take no arguments (noarg)
-    { emit_div0u, { TOK_DIV0U, TOK_NEWLINE } },
-    { emit_rts, { TOK_RTS, TOK_NEWLINE } },
-    { emit_clrmac, { TOK_CLRMAC, TOK_NEWLINE } },
-    { emit_clrs, { TOK_CLRS, TOK_NEWLINE } },
-    { emit_clrt, { TOK_CLRT, TOK_NEWLINE } },
-    { emit_ldtlb, { TOK_LDTLB, TOK_NEWLINE } },
-    { emit_nop, { TOK_NOP, TOK_NEWLINE } },
-    { emit_rte, { TOK_RTE, TOK_NEWLINE } },
-    { emit_sets, { TOK_SETS, TOK_NEWLINE } },
-    { emit_sett, { TOK_SETT, TOK_NEWLINE } },
-    { emit_sleep, { TOK_SLEEP, TOK_NEWLINE } },
-    { emit_frchg, { TOK_FRCHG, TOK_NEWLINE } },
-    { emit_fschg, { TOK_FSCHG, TOK_NEWLINE } },
+    { emit_div0u, { SH4ASM_TOK_DIV0U, SH4ASM_TOK_NEWLINE } },
+    { emit_rts, { SH4ASM_TOK_RTS, SH4ASM_TOK_NEWLINE } },
+    { emit_clrmac, { SH4ASM_TOK_CLRMAC, SH4ASM_TOK_NEWLINE } },
+    { emit_clrs, { SH4ASM_TOK_CLRS, SH4ASM_TOK_NEWLINE } },
+    { emit_clrt, { SH4ASM_TOK_CLRT, SH4ASM_TOK_NEWLINE } },
+    { emit_ldtlb, { SH4ASM_TOK_LDTLB, SH4ASM_TOK_NEWLINE } },
+    { emit_nop, { SH4ASM_TOK_NOP, SH4ASM_TOK_NEWLINE } },
+    { emit_rte, { SH4ASM_TOK_RTE, SH4ASM_TOK_NEWLINE } },
+    { emit_sets, { SH4ASM_TOK_SETS, SH4ASM_TOK_NEWLINE } },
+    { emit_sett, { SH4ASM_TOK_SETT, SH4ASM_TOK_NEWLINE } },
+    { emit_sleep, { SH4ASM_TOK_SLEEP, SH4ASM_TOK_NEWLINE } },
+    { emit_frchg, { SH4ASM_TOK_FRCHG, SH4ASM_TOK_NEWLINE } },
+    { emit_fschg, { SH4ASM_TOK_FSCHG, SH4ASM_TOK_NEWLINE } },
 
-    { emit_movt_rn, { TOK_MOVT, TOK_RN, TOK_NEWLINE } },
-    { emit_cmppz_rn, { TOK_CMPPZ, TOK_RN, TOK_NEWLINE } },
-    { emit_cmppl_rn, { TOK_CMPPL, TOK_RN, TOK_NEWLINE } },
-    { emit_dt_rn, { TOK_DT, TOK_RN, TOK_NEWLINE } },
-    { emit_rotl_rn, { TOK_ROTL, TOK_RN, TOK_NEWLINE } },
-    { emit_rotr_rn, { TOK_ROTR, TOK_RN, TOK_NEWLINE } },
-    { emit_rotcl_rn, { TOK_ROTCL, TOK_RN, TOK_NEWLINE } },
-    { emit_rotcr_rn, { TOK_ROTCR, TOK_RN, TOK_NEWLINE } },
-    { emit_shal_rn, { TOK_SHAL, TOK_RN, TOK_NEWLINE } },
-    { emit_shar_rn, { TOK_SHAR, TOK_RN, TOK_NEWLINE } },
-    { emit_shll_rn, { TOK_SHLL, TOK_RN, TOK_NEWLINE } },
-    { emit_shlr_rn, { TOK_SHLR, TOK_RN, TOK_NEWLINE } },
-    { emit_shll2_rn, { TOK_SHLL2, TOK_RN, TOK_NEWLINE } },
-    { emit_shlr2_rn, { TOK_SHLR2, TOK_RN, TOK_NEWLINE } },
-    { emit_shll8_rn, { TOK_SHLL8, TOK_RN, TOK_NEWLINE } },
-    { emit_shlr8_rn, { TOK_SHLR8, TOK_RN, TOK_NEWLINE } },
-    { emit_shll16_rn, { TOK_SHLL16, TOK_RN, TOK_NEWLINE } },
-    { emit_shlr16_rn, { TOK_SHLR16, TOK_RN, TOK_NEWLINE } },
-    { emit_braf_rn, { TOK_BRAF, TOK_RN, TOK_NEWLINE } },
-    { emit_bsrf_rn, { TOK_BSRF, TOK_RN, TOK_NEWLINE } },
+    { emit_movt_rn, { SH4ASM_TOK_MOVT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_cmppz_rn, { SH4ASM_TOK_CMPPZ, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_cmppl_rn, { SH4ASM_TOK_CMPPL, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_dt_rn, { SH4ASM_TOK_DT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_rotl_rn, { SH4ASM_TOK_ROTL, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_rotr_rn, { SH4ASM_TOK_ROTR, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_rotcl_rn, { SH4ASM_TOK_ROTCL, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_rotcr_rn, { SH4ASM_TOK_ROTCR, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_shal_rn, { SH4ASM_TOK_SHAL, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_shar_rn, { SH4ASM_TOK_SHAR, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_shll_rn, { SH4ASM_TOK_SHLL, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_shlr_rn, { SH4ASM_TOK_SHLR, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_shll2_rn, { SH4ASM_TOK_SHLL2, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_shlr2_rn, { SH4ASM_TOK_SHLR2, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_shll8_rn, { SH4ASM_TOK_SHLL8, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_shlr8_rn, { SH4ASM_TOK_SHLR8, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_shll16_rn, { SH4ASM_TOK_SHLL16, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_shlr16_rn, { SH4ASM_TOK_SHLR16, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_braf_rn, { SH4ASM_TOK_BRAF, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_bsrf_rn, { SH4ASM_TOK_BSRF, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
-    { emit_tasb_arn, { TOK_TASB, TOK_AT, TOK_RN, TOK_NEWLINE } },
-    { emit_ocbi_arn, { TOK_OCBI, TOK_AT, TOK_RN, TOK_NEWLINE } },
-    { emit_ocbp_arn, { TOK_OCBP, TOK_AT, TOK_RN, TOK_NEWLINE } },
-    { emit_ocbwb_arn, { TOK_OCBWB, TOK_AT, TOK_RN, TOK_NEWLINE } },
-    { emit_pref_arn, { TOK_PREF, TOK_AT, TOK_RN, TOK_NEWLINE } },
-    { emit_jmp_arn, { TOK_JMP, TOK_AT, TOK_RN, TOK_NEWLINE } },
-    { emit_jsr_arn, { TOK_JSR, TOK_AT, TOK_RN, TOK_NEWLINE } },
+    { emit_tasb_arn, { SH4ASM_TOK_TASB, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_ocbi_arn, { SH4ASM_TOK_OCBI, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_ocbp_arn, { SH4ASM_TOK_OCBP, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_ocbwb_arn, { SH4ASM_TOK_OCBWB, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_pref_arn, { SH4ASM_TOK_PREF, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_jmp_arn, { SH4ASM_TOK_JMP, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_jsr_arn, { SH4ASM_TOK_JSR, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
-    { emit_ldc_rm_sr, { TOK_LDC, TOK_RN, TOK_COMMA, TOK_SR, TOK_NEWLINE } },
-    { emit_ldc_rm_gbr, { TOK_LDC, TOK_RN, TOK_COMMA, TOK_GBR, TOK_NEWLINE } },
-    { emit_ldc_rm_vbr, { TOK_LDC, TOK_RN, TOK_COMMA, TOK_VBR, TOK_NEWLINE } },
-    { emit_ldc_rm_ssr, { TOK_LDC, TOK_RN, TOK_COMMA, TOK_SSR, TOK_NEWLINE } },
-    { emit_ldc_rm_spc, { TOK_LDC, TOK_RN, TOK_COMMA, TOK_SPC, TOK_NEWLINE } },
-    { emit_ldc_rm_dbr, { TOK_LDC, TOK_RN, TOK_COMMA, TOK_DBR, TOK_NEWLINE } },
-    { emit_lds_rm_mach, { TOK_LDS, TOK_RN, TOK_COMMA, TOK_MACH, TOK_NEWLINE } },
-    { emit_lds_rm_macl, { TOK_LDS, TOK_RN, TOK_COMMA, TOK_MACL, TOK_NEWLINE } },
-    { emit_lds_rm_pr, { TOK_LDS, TOK_RN, TOK_COMMA, TOK_PR, TOK_NEWLINE } },
-    { emit_lds_rm_fpscr, { TOK_LDS, TOK_RN, TOK_COMMA, TOK_FPSCR, TOK_NEWLINE } },
-    { emit_lds_rm_fpul, { TOK_LDS, TOK_RN, TOK_COMMA, TOK_FPUL, TOK_NEWLINE } },
+    { emit_ldc_rm_sr, { SH4ASM_TOK_LDC, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_SR, SH4ASM_TOK_NEWLINE } },
+    { emit_ldc_rm_gbr, { SH4ASM_TOK_LDC, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_GBR, SH4ASM_TOK_NEWLINE } },
+    { emit_ldc_rm_vbr, { SH4ASM_TOK_LDC, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_VBR, SH4ASM_TOK_NEWLINE } },
+    { emit_ldc_rm_ssr, { SH4ASM_TOK_LDC, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_SSR, SH4ASM_TOK_NEWLINE } },
+    { emit_ldc_rm_spc, { SH4ASM_TOK_LDC, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_SPC, SH4ASM_TOK_NEWLINE } },
+    { emit_ldc_rm_dbr, { SH4ASM_TOK_LDC, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_DBR, SH4ASM_TOK_NEWLINE } },
+    { emit_lds_rm_mach, { SH4ASM_TOK_LDS, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_MACH, SH4ASM_TOK_NEWLINE } },
+    { emit_lds_rm_macl, { SH4ASM_TOK_LDS, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_MACL, SH4ASM_TOK_NEWLINE } },
+    { emit_lds_rm_pr, { SH4ASM_TOK_LDS, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_PR, SH4ASM_TOK_NEWLINE } },
+    { emit_lds_rm_fpscr, { SH4ASM_TOK_LDS, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FPSCR, SH4ASM_TOK_NEWLINE } },
+    { emit_lds_rm_fpul, { SH4ASM_TOK_LDS, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FPUL, SH4ASM_TOK_NEWLINE } },
 
-    { emit_stc_sr_rn, { TOK_STC, TOK_SR, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_stc_gbr_rn, { TOK_STC, TOK_GBR, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_stc_vbr_rn, { TOK_STC, TOK_VBR, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_stc_ssr_rn, { TOK_STC, TOK_SSR, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_stc_spc_rn, { TOK_STC, TOK_SPC, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_stc_sgr_rn, { TOK_STC, TOK_SGR, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_stc_dbr_rn, { TOK_STC, TOK_DBR, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_sts_mach_rn, { TOK_STS, TOK_MACH, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_sts_macl_rn, { TOK_STS, TOK_MACL, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_sts_pr_rn, { TOK_STS, TOK_PR, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_sts_fpscr_rn, { TOK_STS, TOK_FPSCR, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_sts_fpul_rn, { TOK_STS, TOK_FPUL, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+    { emit_stc_sr_rn, { SH4ASM_TOK_STC, SH4ASM_TOK_SR, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stc_gbr_rn, { SH4ASM_TOK_STC, SH4ASM_TOK_GBR, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stc_vbr_rn, { SH4ASM_TOK_STC, SH4ASM_TOK_VBR, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stc_ssr_rn, { SH4ASM_TOK_STC, SH4ASM_TOK_SSR, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stc_spc_rn, { SH4ASM_TOK_STC, SH4ASM_TOK_SPC, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stc_sgr_rn, { SH4ASM_TOK_STC, SH4ASM_TOK_SGR, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stc_dbr_rn, { SH4ASM_TOK_STC, SH4ASM_TOK_DBR, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_sts_mach_rn, { SH4ASM_TOK_STS, SH4ASM_TOK_MACH, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_sts_macl_rn, { SH4ASM_TOK_STS, SH4ASM_TOK_MACL, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_sts_pr_rn, { SH4ASM_TOK_STS, SH4ASM_TOK_PR, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_sts_fpscr_rn, { SH4ASM_TOK_STS, SH4ASM_TOK_FPSCR, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_sts_fpul_rn, { SH4ASM_TOK_STS, SH4ASM_TOK_FPUL, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
-    { emit_ldcl_armp_sr, { TOK_LDCL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_SR, TOK_NEWLINE } },
-    { emit_ldcl_armp_gbr, { TOK_LDCL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_GBR, TOK_NEWLINE } },
-    { emit_ldcl_armp_vbr, { TOK_LDCL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_VBR, TOK_NEWLINE } },
-    { emit_ldcl_armp_ssr, { TOK_LDCL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_SSR, TOK_NEWLINE } },
-    { emit_ldcl_armp_spc, { TOK_LDCL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_SPC, TOK_NEWLINE } },
-    { emit_ldcl_armp_dbr, { TOK_LDCL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_DBR, TOK_NEWLINE } },
-    { emit_ldsl_armp_mach, { TOK_LDSL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_MACH, TOK_NEWLINE } },
-    { emit_ldsl_armp_macl, { TOK_LDSL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_MACL, TOK_NEWLINE } },
-    { emit_ldsl_armp_pr, { TOK_LDSL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_PR, TOK_NEWLINE } },
-    { emit_ldsl_armp_fpscr, { TOK_LDSL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_FPSCR, TOK_NEWLINE } },
-    { emit_ldsl_armp_fpul, { TOK_LDSL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_FPUL, TOK_NEWLINE } },
+    { emit_ldcl_armp_sr, { SH4ASM_TOK_LDCL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_SR, SH4ASM_TOK_NEWLINE } },
+    { emit_ldcl_armp_gbr, { SH4ASM_TOK_LDCL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_GBR, SH4ASM_TOK_NEWLINE } },
+    { emit_ldcl_armp_vbr, { SH4ASM_TOK_LDCL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_VBR, SH4ASM_TOK_NEWLINE } },
+    { emit_ldcl_armp_ssr, { SH4ASM_TOK_LDCL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_SSR, SH4ASM_TOK_NEWLINE } },
+    { emit_ldcl_armp_spc, { SH4ASM_TOK_LDCL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_SPC, SH4ASM_TOK_NEWLINE } },
+    { emit_ldcl_armp_dbr, { SH4ASM_TOK_LDCL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_DBR, SH4ASM_TOK_NEWLINE } },
+    { emit_ldsl_armp_mach, { SH4ASM_TOK_LDSL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_MACH, SH4ASM_TOK_NEWLINE } },
+    { emit_ldsl_armp_macl, { SH4ASM_TOK_LDSL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_MACL, SH4ASM_TOK_NEWLINE } },
+    { emit_ldsl_armp_pr, { SH4ASM_TOK_LDSL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_PR, SH4ASM_TOK_NEWLINE } },
+    { emit_ldsl_armp_fpscr, { SH4ASM_TOK_LDSL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_FPSCR, SH4ASM_TOK_NEWLINE } },
+    { emit_ldsl_armp_fpul, { SH4ASM_TOK_LDSL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_FPUL, SH4ASM_TOK_NEWLINE } },
 
-    { emit_stcl_sr_amrn, { TOK_STCL, TOK_SR, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
-    { emit_stcl_gbr_amrn, { TOK_STCL, TOK_GBR, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
-    { emit_stcl_vbr_amrn, { TOK_STCL, TOK_VBR, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
-    { emit_stcl_ssr_amrn, { TOK_STCL, TOK_SSR, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
-    { emit_stcl_spc_amrn, { TOK_STCL, TOK_SPC, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
-    { emit_stcl_sgr_amrn, { TOK_STCL, TOK_SGR, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
-    { emit_stcl_dbr_amrn, { TOK_STCL, TOK_DBR, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
-    { emit_stsl_mach_amrn, { TOK_STSL, TOK_MACH, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
-    { emit_stsl_macl_amrn, { TOK_STSL, TOK_MACL, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
-    { emit_stsl_pr_amrn, { TOK_STSL, TOK_PR, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
-    { emit_stsl_fpscr_amrn, { TOK_STSL, TOK_FPSCR, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
-    { emit_stsl_fpul_amrn, { TOK_STSL, TOK_FPUL, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
+    { emit_stcl_sr_amrn, { SH4ASM_TOK_STCL, SH4ASM_TOK_SR, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stcl_gbr_amrn, { SH4ASM_TOK_STCL, SH4ASM_TOK_GBR, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stcl_vbr_amrn, { SH4ASM_TOK_STCL, SH4ASM_TOK_VBR, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stcl_ssr_amrn, { SH4ASM_TOK_STCL, SH4ASM_TOK_SSR, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stcl_spc_amrn, { SH4ASM_TOK_STCL, SH4ASM_TOK_SPC, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stcl_sgr_amrn, { SH4ASM_TOK_STCL, SH4ASM_TOK_SGR, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stcl_dbr_amrn, { SH4ASM_TOK_STCL, SH4ASM_TOK_DBR, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stsl_mach_amrn, { SH4ASM_TOK_STSL, SH4ASM_TOK_MACH, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stsl_macl_amrn, { SH4ASM_TOK_STSL, SH4ASM_TOK_MACL, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stsl_pr_amrn, { SH4ASM_TOK_STSL, SH4ASM_TOK_PR, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stsl_fpscr_amrn, { SH4ASM_TOK_STSL, SH4ASM_TOK_FPSCR, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_stsl_fpul_amrn, { SH4ASM_TOK_STSL, SH4ASM_TOK_FPUL, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
-    { emit_movcal_r0_arn, { TOK_MOVCAL, TOK_RN, TOK_COMMA, TOK_AT, TOK_RN, TOK_NEWLINE } },
+    { emit_movcal_r0_arn, { SH4ASM_TOK_MOVCAL, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
-    { emit_fldi0_frn, { TOK_FLDI0, TOK_FRN, TOK_NEWLINE } },
-    { emit_fldi1_frn, { TOK_FLDI1, TOK_FRN, TOK_NEWLINE } },
-    { emit_fabs_frn, { TOK_FABS, TOK_FRN, TOK_NEWLINE } },
-    { emit_fneg_frn, { TOK_FNEG, TOK_FRN, TOK_NEWLINE } },
-    { emit_fsqrt_frn, { TOK_FSQRT, TOK_FRN, TOK_NEWLINE } },
-    { emit_fsrra_frn, { TOK_FSRRA, TOK_FRN, TOK_NEWLINE } },
+    { emit_fldi0_frn, { SH4ASM_TOK_FLDI0, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
+    { emit_fldi1_frn, { SH4ASM_TOK_FLDI1, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
+    { emit_fabs_frn, { SH4ASM_TOK_FABS, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
+    { emit_fneg_frn, { SH4ASM_TOK_FNEG, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
+    { emit_fsqrt_frn, { SH4ASM_TOK_FSQRT, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
+    { emit_fsrra_frn, { SH4ASM_TOK_FSRRA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
 
-    { emit_flds_frm_fpul, { TOK_FLDS, TOK_FRN, TOK_COMMA, TOK_FPUL, TOK_NEWLINE } },
-    { emit_ftrc_frm_fpul, { TOK_FTRC, TOK_FRN, TOK_COMMA, TOK_FPUL, TOK_NEWLINE } },
+    { emit_flds_frm_fpul, { SH4ASM_TOK_FLDS, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FPUL, SH4ASM_TOK_NEWLINE } },
+    { emit_ftrc_frm_fpul, { SH4ASM_TOK_FTRC, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FPUL, SH4ASM_TOK_NEWLINE } },
 
-    { emit_fsts_fpul_frn, { TOK_FSTS, TOK_FPUL, TOK_COMMA, TOK_FRN, TOK_NEWLINE } },
-    { emit_float_fpul_frn, { TOK_FLOAT, TOK_FPUL, TOK_COMMA, TOK_FRN, TOK_NEWLINE } },
+    { emit_fsts_fpul_frn, { SH4ASM_TOK_FSTS, SH4ASM_TOK_FPUL, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
+    { emit_float_fpul_frn, { SH4ASM_TOK_FLOAT, SH4ASM_TOK_FPUL, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
 
-    { emit_cmpeq_imm8_r0, { TOK_CMPEQ, TOK_IMM, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_and_imm8_r0, { TOK_AND, TOK_IMM, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_or_imm8_r0, { TOK_OR, TOK_IMM, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_tst_imm8_r0, { TOK_TST, TOK_IMM, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_xor_imm8_r0, { TOK_XOR, TOK_IMM, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+    { emit_cmpeq_imm8_r0, { SH4ASM_TOK_CMPEQ, SH4ASM_TOK_IMM, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_and_imm8_r0, { SH4ASM_TOK_AND, SH4ASM_TOK_IMM, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_or_imm8_r0, { SH4ASM_TOK_OR, SH4ASM_TOK_IMM, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_tst_imm8_r0, { SH4ASM_TOK_TST, SH4ASM_TOK_IMM, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_xor_imm8_r0, { SH4ASM_TOK_XOR, SH4ASM_TOK_IMM, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_andb_imm8_a_r0_gbr,
-      { TOK_ANDB, TOK_IMM, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA,
-        TOK_GBR, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_ANDB, SH4ASM_TOK_IMM, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA,
+        SH4ASM_TOK_GBR, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
     { emit_orb_imm8_a_r0_gbr,
-      { TOK_ORB, TOK_IMM, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA,
-        TOK_GBR, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_ORB, SH4ASM_TOK_IMM, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA,
+        SH4ASM_TOK_GBR, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
     { emit_tstb_imm8_a_r0_gbr,
-      { TOK_TSTB, TOK_IMM, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA,
-        TOK_GBR, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_TSTB, SH4ASM_TOK_IMM, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA,
+        SH4ASM_TOK_GBR, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
     { emit_xorb_imm8_a_r0_gbr,
-      { TOK_XORB, TOK_IMM, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA,
-        TOK_GBR, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_XORB, SH4ASM_TOK_IMM, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA,
+        SH4ASM_TOK_GBR, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
 
-    { emit_bf_offs8, { TOK_BF, TOK_DISP, TOK_NEWLINE } },
-    { emit_bfs_offs8, { TOK_BFS, TOK_DISP, TOK_NEWLINE } },
-    { emit_bt_offs8, { TOK_BT, TOK_DISP, TOK_NEWLINE } },
-    { emit_bts_offs8, { TOK_BTS, TOK_DISP, TOK_NEWLINE } },
+    { emit_bf_offs8, { SH4ASM_TOK_BF, SH4ASM_TOK_DISP, SH4ASM_TOK_NEWLINE } },
+    { emit_bfs_offs8, { SH4ASM_TOK_BFS, SH4ASM_TOK_DISP, SH4ASM_TOK_NEWLINE } },
+    { emit_bt_offs8, { SH4ASM_TOK_BT, SH4ASM_TOK_DISP, SH4ASM_TOK_NEWLINE } },
+    { emit_bts_offs8, { SH4ASM_TOK_BTS, SH4ASM_TOK_DISP, SH4ASM_TOK_NEWLINE } },
 
-    { emit_trapa_imm8, { TOK_TRAPA, TOK_IMM, TOK_NEWLINE } },
+    { emit_trapa_imm8, { SH4ASM_TOK_TRAPA, SH4ASM_TOK_IMM, SH4ASM_TOK_NEWLINE } },
 
     { emit_movb_r0_a_disp8_gbr,
-      { TOK_MOVB, TOK_RN, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_DISP,
-        TOK_COMMA, TOK_GBR, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVB, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_GBR, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
     { emit_movw_r0_a_disp8_gbr,
-      { TOK_MOVW, TOK_RN, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_DISP,
-        TOK_COMMA, TOK_GBR, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVW, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_GBR, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
     { emit_movl_r0_a_disp8_gbr,
-      { TOK_MOVL, TOK_RN, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_DISP,
-        TOK_COMMA, TOK_GBR, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVL, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_GBR, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
 
     { emit_movb_a_disp8_gbr_r0,
-      { TOK_MOVB, TOK_AT, TOK_OPENPAREN, TOK_DISP,
-        TOK_COMMA, TOK_GBR, TOK_CLOSEPAREN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVB, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_GBR, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movw_a_disp8_gbr_r0,
-      { TOK_MOVW, TOK_AT, TOK_OPENPAREN, TOK_DISP,
-        TOK_COMMA, TOK_GBR, TOK_CLOSEPAREN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVW, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_GBR, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movl_a_disp8_gbr_r0,
-      { TOK_MOVL, TOK_AT, TOK_OPENPAREN, TOK_DISP,
-        TOK_COMMA, TOK_GBR, TOK_CLOSEPAREN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVL, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_GBR, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_mova_a_offs8_pc_r0,
-      { TOK_MOVA, TOK_AT, TOK_OPENPAREN, TOK_DISP,
-        TOK_COMMA, TOK_PC, TOK_CLOSEPAREN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_PC, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
-    { emit_bra_offs12, { TOK_BRA, TOK_DISP, TOK_NEWLINE } },
-    { emit_bsr_offs12, { TOK_BSR, TOK_DISP, TOK_NEWLINE } },
+    { emit_bra_offs12, { SH4ASM_TOK_BRA, SH4ASM_TOK_DISP, SH4ASM_TOK_NEWLINE } },
+    { emit_bsr_offs12, { SH4ASM_TOK_BSR, SH4ASM_TOK_DISP, SH4ASM_TOK_NEWLINE } },
 
-    { emit_mov_imm8_rn, { TOK_MOV, TOK_IMM, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_add_imm8_rn, { TOK_ADD, TOK_IMM, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+    { emit_mov_imm8_rn, { SH4ASM_TOK_MOV, SH4ASM_TOK_IMM, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_add_imm8_rn, { SH4ASM_TOK_ADD, SH4ASM_TOK_IMM, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_movw_a_offs8_pc_rn,
-      { TOK_MOVW, TOK_AT, TOK_OPENPAREN, TOK_DISP, TOK_COMMA, TOK_PC,
-        TOK_CLOSEPAREN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVW, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP, SH4ASM_TOK_COMMA, SH4ASM_TOK_PC,
+        SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movl_a_offs8_pc_rn,
-      { TOK_MOVL, TOK_AT, TOK_OPENPAREN, TOK_DISP, TOK_COMMA, TOK_PC,
-        TOK_CLOSEPAREN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVL, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP, SH4ASM_TOK_COMMA, SH4ASM_TOK_PC,
+        SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
-    { emit_mov_rm_rn, { TOK_MOV, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_swapb_rm_rn, { TOK_SWAPB, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_swapw_rm_rn, { TOK_SWAPW, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_xtrct_rm_rn, { TOK_XTRCT, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_add_rm_rn, { TOK_ADD, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_addc_rm_rn, { TOK_ADDC, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_addv_rm_rn, { TOK_ADDV, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_cmpeq_rm_rn, { TOK_CMPEQ, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_cmphs_rm_rn, { TOK_CMPHS, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_cmpge_rm_rn, { TOK_CMPGE, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_cmphi_rm_rn, { TOK_CMPHI, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_cmpgt_rm_rn, { TOK_CMPGT, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_cmpstr_rm_rn, { TOK_CMPSTR, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_div1_rm_rn, { TOK_DIV1, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_div0s_rm_rn, { TOK_DIV0S, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_dmulsl_rm_rn, { TOK_DMULSL, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_dmulul_rm_rn, { TOK_DMULUL, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_extsb_rm_rn, { TOK_EXTSB, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_extsw_rm_rn, { TOK_EXTSW, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_extub_rm_rn, { TOK_EXTUB, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_extuw_rm_rn, { TOK_EXTUW, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_mull_rm_rn, { TOK_MULL, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_mulsw_rm_rn, { TOK_MULSW, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_muluw_rm_rn, { TOK_MULUW, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_neg_rm_rn, { TOK_NEG, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_negc_rm_rn, { TOK_NEGC, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_sub_rm_rn, { TOK_SUB, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_subc_rm_rn, { TOK_SUBC, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_subv_rm_rn, { TOK_SUBV, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_and_rm_rn, { TOK_AND, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_not_rm_rn, { TOK_NOT, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_or_rm_rn, { TOK_OR, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_tst_rm_rn, { TOK_TST, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_xor_rm_rn, { TOK_XOR, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_shad_rm_rn, { TOK_SHAD, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
-    { emit_shld_rm_rn, { TOK_SHLD, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+    { emit_mov_rm_rn, { SH4ASM_TOK_MOV, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_swapb_rm_rn, { SH4ASM_TOK_SWAPB, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_swapw_rm_rn, { SH4ASM_TOK_SWAPW, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_xtrct_rm_rn, { SH4ASM_TOK_XTRCT, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_add_rm_rn, { SH4ASM_TOK_ADD, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_addc_rm_rn, { SH4ASM_TOK_ADDC, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_addv_rm_rn, { SH4ASM_TOK_ADDV, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_cmpeq_rm_rn, { SH4ASM_TOK_CMPEQ, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_cmphs_rm_rn, { SH4ASM_TOK_CMPHS, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_cmpge_rm_rn, { SH4ASM_TOK_CMPGE, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_cmphi_rm_rn, { SH4ASM_TOK_CMPHI, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_cmpgt_rm_rn, { SH4ASM_TOK_CMPGT, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_cmpstr_rm_rn, { SH4ASM_TOK_CMPSTR, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_div1_rm_rn, { SH4ASM_TOK_DIV1, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_div0s_rm_rn, { SH4ASM_TOK_DIV0S, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_dmulsl_rm_rn, { SH4ASM_TOK_DMULSL, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_dmulul_rm_rn, { SH4ASM_TOK_DMULUL, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_extsb_rm_rn, { SH4ASM_TOK_EXTSB, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_extsw_rm_rn, { SH4ASM_TOK_EXTSW, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_extub_rm_rn, { SH4ASM_TOK_EXTUB, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_extuw_rm_rn, { SH4ASM_TOK_EXTUW, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_mull_rm_rn, { SH4ASM_TOK_MULL, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_mulsw_rm_rn, { SH4ASM_TOK_MULSW, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_muluw_rm_rn, { SH4ASM_TOK_MULUW, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_neg_rm_rn, { SH4ASM_TOK_NEG, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_negc_rm_rn, { SH4ASM_TOK_NEGC, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_sub_rm_rn, { SH4ASM_TOK_SUB, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_subc_rm_rn, { SH4ASM_TOK_SUBC, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_subv_rm_rn, { SH4ASM_TOK_SUBV, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_and_rm_rn, { SH4ASM_TOK_AND, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_not_rm_rn, { SH4ASM_TOK_NOT, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_or_rm_rn, { SH4ASM_TOK_OR, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_tst_rm_rn, { SH4ASM_TOK_TST, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_xor_rm_rn, { SH4ASM_TOK_XOR, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_shad_rm_rn, { SH4ASM_TOK_SHAD, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
+    { emit_shld_rm_rn, { SH4ASM_TOK_SHLD, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_movb_rm_a_r0_rn,
-      { TOK_MOVB, TOK_RN, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA,
-        TOK_RN, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVB, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA,
+        SH4ASM_TOK_RN, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
     { emit_movw_rm_a_r0_rn,
-      { TOK_MOVW, TOK_RN, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA,
-        TOK_RN, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVW, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA,
+        SH4ASM_TOK_RN, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
     { emit_movl_rm_a_r0_rn,
-      { TOK_MOVL, TOK_RN, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA,
-        TOK_RN, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVL, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA,
+        SH4ASM_TOK_RN, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
 
     { emit_movb_a_r0_rm_rn,
-      { TOK_MOVB, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA, TOK_RN,
-        TOK_CLOSEPAREN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVB, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN,
+        SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movw_a_r0_rm_rn,
-      { TOK_MOVW, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA, TOK_RN,
-        TOK_CLOSEPAREN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVW, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN,
+        SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movl_a_r0_rm_rn,
-      { TOK_MOVL, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA, TOK_RN,
-        TOK_CLOSEPAREN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVL, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN,
+        SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_movb_rm_arn,
-      { TOK_MOVB, TOK_RN, TOK_COMMA, TOK_AT, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVB, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movw_rm_arn,
-      { TOK_MOVW, TOK_RN, TOK_COMMA, TOK_AT, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVW, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movl_rm_arn,
-      { TOK_MOVL, TOK_RN, TOK_COMMA, TOK_AT, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVL, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_movb_arm_rn,
-      { TOK_MOVB, TOK_AT, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVB, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movw_arm_rn,
-      { TOK_MOVW, TOK_AT, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVW, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movl_arm_rn,
-      { TOK_MOVL, TOK_AT, TOK_RN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_movb_rm_amrn,
-      { TOK_MOVB, TOK_RN, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVB, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movw_rm_amrn,
-      { TOK_MOVW, TOK_RN, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVW, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movl_rm_amrn,
-      { TOK_MOVL, TOK_RN, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVL, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_movb_armp_rn,
-      { TOK_MOVB, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVB, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movw_armp_rn,
-      { TOK_MOVW, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVW, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movl_armp_rn,
-      { TOK_MOVL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_macl_armp_arnp,
-      { TOK_MAC_DOT_L, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA,
-        TOK_AT, TOK_RN, TOK_PLUS, TOK_NEWLINE } },
+      { SH4ASM_TOK_MAC_DOT_L, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA,
+        SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_NEWLINE } },
     { emit_macw_armp_arnp,
-      { TOK_MAC_DOT_W, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA,
-        TOK_AT, TOK_RN, TOK_PLUS, TOK_NEWLINE } },
+      { SH4ASM_TOK_MAC_DOT_W, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA,
+        SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_frm_frn,
-      { TOK_FMOV, TOK_FRN, TOK_COMMA, TOK_FRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
     { emit_fadd_frm_frn,
-      { TOK_FADD, TOK_FRN, TOK_COMMA, TOK_FRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FADD, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
     { emit_fcmpeq_frm_frn,
-      { TOK_FCMPEQ, TOK_FRN, TOK_COMMA, TOK_FRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FCMPEQ, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
     { emit_fcmpgt_frm_frn,
-      { TOK_FCMPGT, TOK_FRN, TOK_COMMA, TOK_FRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FCMPGT, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
     { emit_fdiv_frm_frn,
-      { TOK_FDIV, TOK_FRN, TOK_COMMA, TOK_FRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FDIV, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
     { emit_fmul_frm_frn,
-      { TOK_FMUL, TOK_FRN, TOK_COMMA, TOK_FRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMUL, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
     { emit_fsub_frm_frn,
-      { TOK_FSUB, TOK_FRN, TOK_COMMA, TOK_FRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FSUB, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmovs_arm_frn,
-      { TOK_FMOVS, TOK_AT, TOK_RN, TOK_COMMA, TOK_FRN,
-        TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOVS, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN,
+        SH4ASM_TOK_NEWLINE } },
 
     { emit_fmovs_a_r0_rm_frn,
-      { TOK_FMOVS, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA, TOK_RN,
-        TOK_CLOSEPAREN, TOK_COMMA, TOK_FRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOVS, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN,
+        SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmovs_armp_frn,
-      { TOK_FMOVS, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_FRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOVS, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmovs_frm_arn,
-      { TOK_FMOVS, TOK_FRN, TOK_COMMA, TOK_AT, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOVS, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmovs_frm_amrn,
-      { TOK_FMOVS, TOK_FRN, TOK_COMMA, TOK_AT,
-        TOK_MINUS, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOVS, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT,
+        SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmovs_frm_a_r0_rn,
-      { TOK_FMOVS, TOK_FRN, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_RN,
-        TOK_COMMA, TOK_RN, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOVS, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmac_fr0_frm_frn,
-      { TOK_FMAC, TOK_FRN, TOK_COMMA, TOK_FRN,
-        TOK_COMMA, TOK_FRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMAC, SH4ASM_TOK_FRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_FRN, SH4ASM_TOK_NEWLINE } },
 
     { emit_ldc_rm_rn_bank,
-      { TOK_LDC, TOK_RN, TOK_COMMA, TOK_RN_BANK, TOK_NEWLINE } },
+      { SH4ASM_TOK_LDC, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN_BANK, SH4ASM_TOK_NEWLINE } },
 
     { emit_stc_rm_bank_rn,
-      { TOK_STC, TOK_RN_BANK, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_STC, SH4ASM_TOK_RN_BANK, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_ldcl_armp_rn_bank,
-      { TOK_LDCL, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_RN_BANK,
-        TOK_NEWLINE } },
+      { SH4ASM_TOK_LDCL, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN_BANK,
+        SH4ASM_TOK_NEWLINE } },
 
     { emit_stcl_rm_bank_amrn,
-      { TOK_STCL, TOK_RN_BANK, TOK_COMMA, TOK_AT, TOK_MINUS, TOK_RN,
-        TOK_NEWLINE } },
+      { SH4ASM_TOK_STCL, SH4ASM_TOK_RN_BANK, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_MINUS, SH4ASM_TOK_RN,
+        SH4ASM_TOK_NEWLINE } },
 
     { emit_movb_r0_a_disp4_rn,
-      { TOK_MOVB, TOK_RN, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_DISP,
-        TOK_COMMA, TOK_RN, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVB, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
     { emit_movw_r0_a_disp4_rn,
-      { TOK_MOVW, TOK_RN, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_DISP,
-        TOK_COMMA, TOK_RN, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVW, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
 
     { emit_movb_a_disp4_rm_r0,
-      { TOK_MOVB, TOK_AT, TOK_OPENPAREN, TOK_DISP, TOK_COMMA, TOK_RN,
-        TOK_CLOSEPAREN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVB, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN,
+        SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
     { emit_movw_a_disp4_rm_r0,
-      { TOK_MOVW, TOK_AT, TOK_OPENPAREN, TOK_DISP, TOK_COMMA, TOK_RN,
-        TOK_CLOSEPAREN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVW, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN,
+        SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_movl_rm_a_disp4_rn,
-      { TOK_MOVL, TOK_RN, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_DISP,
-        TOK_COMMA, TOK_RN, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVL, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
 
     { emit_movl_a_disp4_rm_rn,
-      { TOK_MOVL, TOK_AT, TOK_OPENPAREN, TOK_DISP, TOK_COMMA, TOK_RN,
-        TOK_CLOSEPAREN, TOK_COMMA, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_MOVL, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_DISP, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN,
+        SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_drm_drn,
-      { TOK_FMOV, TOK_DRN, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
     { emit_fadd_drm_drn,
-      { TOK_FADD, TOK_DRN, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FADD, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
     { emit_fcmpeq_drm_drn,
-      { TOK_FCMPEQ, TOK_DRN, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FCMPEQ, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
     { emit_fcmpgt_drm_drn,
-      { TOK_FCMPGT, TOK_DRN, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FCMPGT, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
     { emit_fdiv_drm_drn,
-      { TOK_FDIV, TOK_DRN, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FDIV, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
     { emit_fmul_drm_drn,
-      { TOK_FMUL, TOK_DRN, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMUL, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
     { emit_fsub_drm_drn,
-      { TOK_FSUB, TOK_DRN, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FSUB, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_drm_xdn,
-      { TOK_FMOV, TOK_DRN, TOK_COMMA, TOK_XDN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_XDN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_xdm_drn,
-      { TOK_FMOV, TOK_XDN, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_XDN, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_xdm_xdn,
-      { TOK_FMOV, TOK_XDN, TOK_COMMA, TOK_XDN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_XDN, SH4ASM_TOK_COMMA, SH4ASM_TOK_XDN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_arm_drn,
-      { TOK_FMOV, TOK_AT, TOK_RN, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_a_r0_rm_drn,
-      { TOK_FMOV, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA, TOK_RN,
-        TOK_CLOSEPAREN, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN,
+        SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_armp_drn,
-      { TOK_FMOV, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_arm_xdn,
-      { TOK_FMOV, TOK_AT, TOK_RN, TOK_COMMA, TOK_XDN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_XDN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_armp_xdn,
-      { TOK_FMOV, TOK_AT, TOK_RN, TOK_PLUS, TOK_COMMA, TOK_XDN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_PLUS, SH4ASM_TOK_COMMA, SH4ASM_TOK_XDN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_a_r0_rm_xdn,
-      { TOK_FMOV, TOK_AT, TOK_OPENPAREN, TOK_RN, TOK_COMMA, TOK_RN,
-        TOK_CLOSEPAREN, TOK_COMMA, TOK_XDN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN, SH4ASM_TOK_COMMA, SH4ASM_TOK_RN,
+        SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_COMMA, SH4ASM_TOK_XDN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_drm_amrn,
-      { TOK_FMOV, TOK_DRN, TOK_COMMA, TOK_AT,
-        TOK_MINUS, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT,
+        SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_drm_arn,
-      { TOK_FMOV, TOK_DRN, TOK_COMMA, TOK_AT, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_drm_a_r0_rn,
-      { TOK_FMOV, TOK_DRN, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_RN,
-        TOK_COMMA, TOK_RN, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_xdm_arn,
-      { TOK_FMOV, TOK_XDN, TOK_COMMA, TOK_AT, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_XDN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_xdm_amrn,
-      { TOK_FMOV, TOK_XDN, TOK_COMMA, TOK_AT,
-        TOK_MINUS, TOK_RN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_XDN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT,
+        SH4ASM_TOK_MINUS, SH4ASM_TOK_RN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fmov_xdm_a_r0_rn,
-      { TOK_FMOV, TOK_XDN, TOK_COMMA, TOK_AT, TOK_OPENPAREN, TOK_RN,
-        TOK_COMMA, TOK_RN, TOK_CLOSEPAREN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FMOV, SH4ASM_TOK_XDN, SH4ASM_TOK_COMMA, SH4ASM_TOK_AT, SH4ASM_TOK_OPENPAREN, SH4ASM_TOK_RN,
+        SH4ASM_TOK_COMMA, SH4ASM_TOK_RN, SH4ASM_TOK_CLOSEPAREN, SH4ASM_TOK_NEWLINE } },
 
-    { emit_fabs_drn, { TOK_FABS, TOK_DRN, TOK_NEWLINE } },
-    { emit_fneg_drn, { TOK_FNEG, TOK_DRN, TOK_NEWLINE } },
-    { emit_fsqrt_drn, { TOK_FSQRT, TOK_DRN, TOK_NEWLINE } },
+    { emit_fabs_drn, { SH4ASM_TOK_FABS, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
+    { emit_fneg_drn, { SH4ASM_TOK_FNEG, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
+    { emit_fsqrt_drn, { SH4ASM_TOK_FSQRT, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fcnvds_drm_fpul,
-      { TOK_FCNVDS, TOK_DRN, TOK_COMMA, TOK_FPUL, TOK_NEWLINE } },
+      { SH4ASM_TOK_FCNVDS, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FPUL, SH4ASM_TOK_NEWLINE } },
     { emit_ftrc_drm_fpul,
-      { TOK_FTRC, TOK_DRN, TOK_COMMA, TOK_FPUL, TOK_NEWLINE } },
+      { SH4ASM_TOK_FTRC, SH4ASM_TOK_DRN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FPUL, SH4ASM_TOK_NEWLINE } },
 
     { emit_fcnvsd_fpul_drn,
-      { TOK_FCNVSD, TOK_FPUL, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FCNVSD, SH4ASM_TOK_FPUL, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
     { emit_float_fpul_drn,
-      { TOK_FLOAT, TOK_FPUL, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FLOAT, SH4ASM_TOK_FPUL, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
     { emit_fsca_fpul_drn,
-      { TOK_FSCA, TOK_FPUL, TOK_COMMA, TOK_DRN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FSCA, SH4ASM_TOK_FPUL, SH4ASM_TOK_COMMA, SH4ASM_TOK_DRN, SH4ASM_TOK_NEWLINE } },
 
     { emit_fipr_fvm_fvn,
-      { TOK_FIPR, TOK_FVN, TOK_COMMA, TOK_FVN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FIPR, SH4ASM_TOK_FVN, SH4ASM_TOK_COMMA, SH4ASM_TOK_FVN, SH4ASM_TOK_NEWLINE } },
 
     { emit_ftrv_xmtrx_fvn,
-      { TOK_FTRV, TOK_XMTRX, TOK_COMMA, TOK_FVN, TOK_NEWLINE } },
+      { SH4ASM_TOK_FTRV, SH4ASM_TOK_XMTRX, SH4ASM_TOK_COMMA, SH4ASM_TOK_FVN, SH4ASM_TOK_NEWLINE } },
 
     { NULL }
 };
 
-static void push_token(struct tok const *tk);
+static void push_token(struct sh4asm_tok const *tk);
 static void process_line(void);
 static bool check_pattern(struct pattern const *ptrn);
 
-void parser_input_token(struct tok const *tk) {
-    if (tk->tp == TOK_NEWLINE) {
+void parser_input_token(struct sh4asm_tok const *tk) {
+    if (tk->tp == SH4ASM_TOK_NEWLINE) {
         process_line();
         n_tokens = 0;
     } else {
@@ -1440,7 +1440,7 @@ void parser_set_emitter(sh4asm_bin_emit_handler_func em) {
     emit = em;
 }
 
-static void push_token(struct tok const *tk) {
+static void push_token(struct sh4asm_tok const *tk) {
     if (n_tokens >= MAX_TOKENS)
         sh4asm_error("too many tokens");
     tokens[n_tokens++] = *tk;
@@ -1460,7 +1460,7 @@ static void process_line(void) {
     printf("%u tokens\n\t", n_tokens);
     unsigned tok_idx;
     for (tok_idx = 0; tok_idx < n_tokens; tok_idx++)
-        printf("%s ", tok_as_str(tokens + tok_idx));
+        printf("%s ", sh4asm_tok_as_str(tokens + tok_idx));
     puts("\n");
 
     sh4asm_error("unrecognized pattern");
@@ -1470,7 +1470,7 @@ static bool check_pattern(struct pattern const *ptrn) {
     enum tok_tp const *cur_tok = ptrn->toks;
     unsigned tok_idx = 0;
 
-    while (*cur_tok != TOK_NEWLINE && tok_idx < n_tokens) {
+    while (*cur_tok != SH4ASM_TOK_NEWLINE && tok_idx < n_tokens) {
         if (*cur_tok != tokens[tok_idx].tp)
             return false;
 
@@ -1478,7 +1478,7 @@ static bool check_pattern(struct pattern const *ptrn) {
         tok_idx++;
     }
 
-    return (*cur_tok == TOK_NEWLINE) && (tok_idx == n_tokens);
+    return (*cur_tok == SH4ASM_TOK_NEWLINE) && (tok_idx == n_tokens);
 }
 
 void parser_reset(void) {

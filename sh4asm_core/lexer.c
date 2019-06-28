@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2017, snickerbockers <chimerasaurusrex@gmail.com>
+ * Copyright (c) 2017, 2019 snickerbockers <chimerasaurusrex@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,168 +42,168 @@
 #include "sh4asm.h"
 #include "lexer.h"
 
-static struct tok_mapping {
+static struct sh4asm_tok_mapping {
     char const *txt;
     enum tok_tp tok;
 } const tok_map[] = {
-    { ",", TOK_COMMA },
-    { "(", TOK_OPENPAREN },
-    { ")", TOK_CLOSEPAREN },
-    { "@", TOK_AT },
-    { "\\n", TOK_NEWLINE },
-    { "+", TOK_PLUS },
-    { "div0u", TOK_DIV0U },
-    { "rts", TOK_RTS },
-    { "clrmac", TOK_CLRMAC },
-    { "clrs", TOK_CLRS },
-    { "clrt", TOK_CLRT },
-    { "ldtlb", TOK_LDTLB },
-    { "nop", TOK_NOP },
-    { "rte", TOK_RTE },
-    { "sets", TOK_SETS },
-    { "sett", TOK_SETT },
-    { "sleep", TOK_SLEEP },
-    { "frchg", TOK_FRCHG },
-    { "fschg", TOK_FSCHG },
-    { "movt", TOK_MOVT },
-    { "cmp/pz", TOK_CMPPZ },
-    { "cmp/pl", TOK_CMPPL },
-    { "dt", TOK_DT },
-    { "rotl", TOK_ROTL },
-    { "rotr", TOK_ROTR },
-    { "rotcl", TOK_ROTCL },
-    { "rotcr", TOK_ROTCR },
-    { "shal", TOK_SHAL },
-    { "shar", TOK_SHAR },
-    { "shll", TOK_SHLL },
-    { "shlr", TOK_SHLR },
-    { "shll2", TOK_SHLL2 },
-    { "shlr2", TOK_SHLR2 },
-    { "shll8", TOK_SHLL8 },
-    { "shlr8", TOK_SHLR8 },
-    { "shll16", TOK_SHLL16 },
-    { "shlr16", TOK_SHLR16 },
-    { "braf", TOK_BRAF },
-    { "bsrf", TOK_BSRF },
-    { "cmp/eq", TOK_CMPEQ },
-    { "and.b", TOK_ANDB },
-    { "and", TOK_AND },
-    { "or.b", TOK_ORB },
-    { "or", TOK_OR },
-    { "tst", TOK_TST },
-    { "tst.b", TOK_TSTB },
-    { "xor", TOK_XOR },
-    { "xor.b", TOK_XORB },
-    { "bf", TOK_BF },
-    { "bf/s", TOK_BFS },
-    { "bt", TOK_BT },
-    { "bt/s", TOK_BTS },
-    { "bra", TOK_BRA },
-    { "bsr", TOK_BSR },
-    { "trapa", TOK_TRAPA },
-    { "tas.b", TOK_TASB },
-    { "ocbi", TOK_OCBI },
-    { "ocbp", TOK_OCBP },
-    { "ocbwb", TOK_OCBWB },
-    { "pref", TOK_PREF },
-    { "jmp", TOK_JMP },
-    { "jsr", TOK_JSR },
-    { "ldc", TOK_LDC },
-    { "stc", TOK_STC },
-    { "ldc.l", TOK_LDCL },
-    { "stc.l", TOK_STCL },
-    { "mov", TOK_MOV },
-    { "add", TOK_ADD },
-    { "mov.w", TOK_MOVW },
-    { "mov.l", TOK_MOVL },
-    { "swap.b", TOK_SWAPB },
-    { "swap.w", TOK_SWAPW },
-    { "xtrct", TOK_XTRCT },
-    { "addc", TOK_ADDC },
-    { "addv", TOK_ADDV },
-    { "cmp/hs", TOK_CMPHS },
-    { "cmp/ge", TOK_CMPGE },
-    { "cmp/hi", TOK_CMPHI },
-    { "cmp/gt", TOK_CMPGT },
-    { "cmp/str", TOK_CMPSTR },
-    { "div1", TOK_DIV1 },
-    { "div0s", TOK_DIV0S },
-    { "dmuls.l", TOK_DMULSL },
-    { "dmulu.l", TOK_DMULUL },
-    { "exts.b", TOK_EXTSB },
-    { "exts.w", TOK_EXTSW },
-    { "extu.b", TOK_EXTUB },
-    { "extu.w", TOK_EXTUW },
-    { "mul.l", TOK_MULL },
-    { "muls.w", TOK_MULSW },
-    { "mulu.w", TOK_MULUW },
-    { "neg", TOK_NEG },
-    { "negc", TOK_NEGC },
-    { "sub", TOK_SUB },
-    { "subc", TOK_SUBC },
-    { "subv", TOK_SUBV },
-    { "not", TOK_NOT },
-    { "shad", TOK_SHAD },
-    { "shld", TOK_SHLD },
-    { "lds", TOK_LDS },
-    { "sts", TOK_STS },
-    { "lds.l", TOK_LDSL },
-    { "sts.l", TOK_STSL },
-    { "mov.b", TOK_MOVB },
-    { "mova", TOK_MOVA },
-    { "movca.l", TOK_MOVCAL },
-    { "mac.w", TOK_MAC_DOT_W },
-    { "mac.l", TOK_MAC_DOT_L },
-    { "fldi0", TOK_FLDI0 },
-    { "fldi1", TOK_FLDI1 },
-    { "fmov", TOK_FMOV },
-    { "fmov.s", TOK_FMOVS },
-    { "flds", TOK_FLDS },
-    { "fsts", TOK_FSTS },
-    { "fabs", TOK_FABS },
-    { "fadd", TOK_FADD },
-    { "fcmp/eq", TOK_FCMPEQ },
-    { "fcmp/gt", TOK_FCMPGT },
-    { "fdiv", TOK_FDIV },
-    { "float", TOK_FLOAT },
-    { "fmac", TOK_FMAC },
-    { "fmul", TOK_FMUL },
-    { "fneg", TOK_FNEG },
-    { "fsqrt", TOK_FSQRT },
-    { "fsub", TOK_FSUB },
-    { "ftrc", TOK_FTRC },
-    { "fcnvds", TOK_FCNVDS },
-    { "fcnvsd", TOK_FCNVSD },
-    { "fipr", TOK_FIPR },
-    { "ftrv", TOK_FTRV },
-    { "fsca", TOK_FSCA },
-    { "fsrra", TOK_FSRRA },
+    { ",", SH4ASM_TOK_COMMA },
+    { "(", SH4ASM_TOK_OPENPAREN },
+    { ")", SH4ASM_TOK_CLOSEPAREN },
+    { "@", SH4ASM_TOK_AT },
+    { "\\n", SH4ASM_TOK_NEWLINE },
+    { "+", SH4ASM_TOK_PLUS },
+    { "div0u", SH4ASM_TOK_DIV0U },
+    { "rts", SH4ASM_TOK_RTS },
+    { "clrmac", SH4ASM_TOK_CLRMAC },
+    { "clrs", SH4ASM_TOK_CLRS },
+    { "clrt", SH4ASM_TOK_CLRT },
+    { "ldtlb", SH4ASM_TOK_LDTLB },
+    { "nop", SH4ASM_TOK_NOP },
+    { "rte", SH4ASM_TOK_RTE },
+    { "sets", SH4ASM_TOK_SETS },
+    { "sett", SH4ASM_TOK_SETT },
+    { "sleep", SH4ASM_TOK_SLEEP },
+    { "frchg", SH4ASM_TOK_FRCHG },
+    { "fschg", SH4ASM_TOK_FSCHG },
+    { "movt", SH4ASM_TOK_MOVT },
+    { "cmp/pz", SH4ASM_TOK_CMPPZ },
+    { "cmp/pl", SH4ASM_TOK_CMPPL },
+    { "dt", SH4ASM_TOK_DT },
+    { "rotl", SH4ASM_TOK_ROTL },
+    { "rotr", SH4ASM_TOK_ROTR },
+    { "rotcl", SH4ASM_TOK_ROTCL },
+    { "rotcr", SH4ASM_TOK_ROTCR },
+    { "shal", SH4ASM_TOK_SHAL },
+    { "shar", SH4ASM_TOK_SHAR },
+    { "shll", SH4ASM_TOK_SHLL },
+    { "shlr", SH4ASM_TOK_SHLR },
+    { "shll2", SH4ASM_TOK_SHLL2 },
+    { "shlr2", SH4ASM_TOK_SHLR2 },
+    { "shll8", SH4ASM_TOK_SHLL8 },
+    { "shlr8", SH4ASM_TOK_SHLR8 },
+    { "shll16", SH4ASM_TOK_SHLL16 },
+    { "shlr16", SH4ASM_TOK_SHLR16 },
+    { "braf", SH4ASM_TOK_BRAF },
+    { "bsrf", SH4ASM_TOK_BSRF },
+    { "cmp/eq", SH4ASM_TOK_CMPEQ },
+    { "and.b", SH4ASM_TOK_ANDB },
+    { "and", SH4ASM_TOK_AND },
+    { "or.b", SH4ASM_TOK_ORB },
+    { "or", SH4ASM_TOK_OR },
+    { "tst", SH4ASM_TOK_TST },
+    { "tst.b", SH4ASM_TOK_TSTB },
+    { "xor", SH4ASM_TOK_XOR },
+    { "xor.b", SH4ASM_TOK_XORB },
+    { "bf", SH4ASM_TOK_BF },
+    { "bf/s", SH4ASM_TOK_BFS },
+    { "bt", SH4ASM_TOK_BT },
+    { "bt/s", SH4ASM_TOK_BTS },
+    { "bra", SH4ASM_TOK_BRA },
+    { "bsr", SH4ASM_TOK_BSR },
+    { "trapa", SH4ASM_TOK_TRAPA },
+    { "tas.b", SH4ASM_TOK_TASB },
+    { "ocbi", SH4ASM_TOK_OCBI },
+    { "ocbp", SH4ASM_TOK_OCBP },
+    { "ocbwb", SH4ASM_TOK_OCBWB },
+    { "pref", SH4ASM_TOK_PREF },
+    { "jmp", SH4ASM_TOK_JMP },
+    { "jsr", SH4ASM_TOK_JSR },
+    { "ldc", SH4ASM_TOK_LDC },
+    { "stc", SH4ASM_TOK_STC },
+    { "ldc.l", SH4ASM_TOK_LDCL },
+    { "stc.l", SH4ASM_TOK_STCL },
+    { "mov", SH4ASM_TOK_MOV },
+    { "add", SH4ASM_TOK_ADD },
+    { "mov.w", SH4ASM_TOK_MOVW },
+    { "mov.l", SH4ASM_TOK_MOVL },
+    { "swap.b", SH4ASM_TOK_SWAPB },
+    { "swap.w", SH4ASM_TOK_SWAPW },
+    { "xtrct", SH4ASM_TOK_XTRCT },
+    { "addc", SH4ASM_TOK_ADDC },
+    { "addv", SH4ASM_TOK_ADDV },
+    { "cmp/hs", SH4ASM_TOK_CMPHS },
+    { "cmp/ge", SH4ASM_TOK_CMPGE },
+    { "cmp/hi", SH4ASM_TOK_CMPHI },
+    { "cmp/gt", SH4ASM_TOK_CMPGT },
+    { "cmp/str", SH4ASM_TOK_CMPSTR },
+    { "div1", SH4ASM_TOK_DIV1 },
+    { "div0s", SH4ASM_TOK_DIV0S },
+    { "dmuls.l", SH4ASM_TOK_DMULSL },
+    { "dmulu.l", SH4ASM_TOK_DMULUL },
+    { "exts.b", SH4ASM_TOK_EXTSB },
+    { "exts.w", SH4ASM_TOK_EXTSW },
+    { "extu.b", SH4ASM_TOK_EXTUB },
+    { "extu.w", SH4ASM_TOK_EXTUW },
+    { "mul.l", SH4ASM_TOK_MULL },
+    { "muls.w", SH4ASM_TOK_MULSW },
+    { "mulu.w", SH4ASM_TOK_MULUW },
+    { "neg", SH4ASM_TOK_NEG },
+    { "negc", SH4ASM_TOK_NEGC },
+    { "sub", SH4ASM_TOK_SUB },
+    { "subc", SH4ASM_TOK_SUBC },
+    { "subv", SH4ASM_TOK_SUBV },
+    { "not", SH4ASM_TOK_NOT },
+    { "shad", SH4ASM_TOK_SHAD },
+    { "shld", SH4ASM_TOK_SHLD },
+    { "lds", SH4ASM_TOK_LDS },
+    { "sts", SH4ASM_TOK_STS },
+    { "lds.l", SH4ASM_TOK_LDSL },
+    { "sts.l", SH4ASM_TOK_STSL },
+    { "mov.b", SH4ASM_TOK_MOVB },
+    { "mova", SH4ASM_TOK_MOVA },
+    { "movca.l", SH4ASM_TOK_MOVCAL },
+    { "mac.w", SH4ASM_TOK_MAC_DOT_W },
+    { "mac.l", SH4ASM_TOK_MAC_DOT_L },
+    { "fldi0", SH4ASM_TOK_FLDI0 },
+    { "fldi1", SH4ASM_TOK_FLDI1 },
+    { "fmov", SH4ASM_TOK_FMOV },
+    { "fmov.s", SH4ASM_TOK_FMOVS },
+    { "flds", SH4ASM_TOK_FLDS },
+    { "fsts", SH4ASM_TOK_FSTS },
+    { "fabs", SH4ASM_TOK_FABS },
+    { "fadd", SH4ASM_TOK_FADD },
+    { "fcmp/eq", SH4ASM_TOK_FCMPEQ },
+    { "fcmp/gt", SH4ASM_TOK_FCMPGT },
+    { "fdiv", SH4ASM_TOK_FDIV },
+    { "float", SH4ASM_TOK_FLOAT },
+    { "fmac", SH4ASM_TOK_FMAC },
+    { "fmul", SH4ASM_TOK_FMUL },
+    { "fneg", SH4ASM_TOK_FNEG },
+    { "fsqrt", SH4ASM_TOK_FSQRT },
+    { "fsub", SH4ASM_TOK_FSUB },
+    { "ftrc", SH4ASM_TOK_FTRC },
+    { "fcnvds", SH4ASM_TOK_FCNVDS },
+    { "fcnvsd", SH4ASM_TOK_FCNVSD },
+    { "fipr", SH4ASM_TOK_FIPR },
+    { "ftrv", SH4ASM_TOK_FTRV },
+    { "fsca", SH4ASM_TOK_FSCA },
+    { "fsrra", SH4ASM_TOK_FSRRA },
 
 
-    { "sr", TOK_SR },
-    { "gbr", TOK_GBR },
-    { "vbr", TOK_VBR },
-    { "ssr", TOK_SSR },
-    { "spc", TOK_SPC },
-    { "sgr", TOK_SGR },
-    { "dbr", TOK_DBR },
-    { "pc", TOK_PC },
-    { "mach", TOK_MACH },
-    { "macl", TOK_MACL },
-    { "pr", TOK_PR },
-    { "fpul", TOK_FPUL },
-    { "fpscr", TOK_FPSCR },
+    { "sr", SH4ASM_TOK_SR },
+    { "gbr", SH4ASM_TOK_GBR },
+    { "vbr", SH4ASM_TOK_VBR },
+    { "ssr", SH4ASM_TOK_SSR },
+    { "spc", SH4ASM_TOK_SPC },
+    { "sgr", SH4ASM_TOK_SGR },
+    { "dbr", SH4ASM_TOK_DBR },
+    { "pc", SH4ASM_TOK_PC },
+    { "mach", SH4ASM_TOK_MACH },
+    { "macl", SH4ASM_TOK_MACL },
+    { "pr", SH4ASM_TOK_PR },
+    { "fpul", SH4ASM_TOK_FPUL },
+    { "fpscr", SH4ASM_TOK_FPSCR },
 
-    { "xmtrx", TOK_XMTRX },
+    { "xmtrx", SH4ASM_TOK_XMTRX },
 
     { NULL }
 };
-#define TOK_LEN_MAX 32
-static char cur_tok[TOK_LEN_MAX];
+#define SH4ASM_TOK_LEN_MAX 32
+static char cur_tok[SH4ASM_TOK_LEN_MAX];
 static unsigned tok_len;
 
-static struct tok_mapping const* check_tok(void) {
-    struct tok_mapping const *curs = tok_map;
+static struct sh4asm_tok_mapping const* check_tok(void) {
+    struct sh4asm_tok_mapping const *curs = tok_map;
 
     while (curs->txt) {
         if (strcmp(cur_tok, curs->txt) == 0) {
@@ -215,8 +215,8 @@ static struct tok_mapping const* check_tok(void) {
     return NULL; // no token found
 }
 
-void lexer_input_char(char ch, emit_tok_func emit) {
-    if (tok_len >= (TOK_LEN_MAX - 1))
+void sh4asm_lexer_input_char(char ch, sh4asm_tok_emit_func emit) {
+    if (tok_len >= (SH4ASM_TOK_LEN_MAX - 1))
         sh4asm_error("Token is too long");
 
     if (isspace(ch) || ch == ',' || ch == '@' || ch == '(' || ch == ')' ||
@@ -224,10 +224,10 @@ void lexer_input_char(char ch, emit_tok_func emit) {
         if (tok_len) {
             cur_tok[tok_len] = '\0';
 
-            struct tok_mapping const *mapping = check_tok();
+            struct sh4asm_tok_mapping const *mapping = check_tok();
             if (mapping) {
                 // 'normal' single-word token
-                struct tok tk = {
+                struct sh4asm_tok tk = {
                     .tp = mapping->tok
                 };
                 emit(&tk);
@@ -237,8 +237,8 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 long val_as_long = strtol(cur_tok + 1, NULL, 0);
                 if (errno)
                     sh4asm_error("failed to decode integer literal");
-                struct tok tk = {
-                    .tp = TOK_IMM,
+                struct sh4asm_tok tk = {
+                    .tp = SH4ASM_TOK_IMM,
                     .val = { .as_int = val_as_long }
                 };
                 emit(&tk);
@@ -247,8 +247,8 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 int reg_no = atoi(cur_tok + 1);
                 if (reg_no < 0 || reg_no > 15)
                     sh4asm_error("invalid register index %d", reg_no);
-                struct tok tk = {
-                    .tp = TOK_RN,
+                struct sh4asm_tok tk = {
+                    .tp = SH4ASM_TOK_RN,
                     .val = { .reg_idx = reg_no }
                 };
                 emit(&tk);
@@ -260,8 +260,8 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 int reg_no = atoi(cur_tok + 1);
                 if (reg_no < 0 || reg_no > 15)
                     sh4asm_error("invalid banked register index %d", reg_no);
-                struct tok tk = {
-                    .tp = TOK_RN_BANK,
+                struct sh4asm_tok tk = {
+                    .tp = SH4ASM_TOK_RN_BANK,
                     .val = { .reg_idx = reg_no }
                 };
                 emit(&tk);
@@ -272,8 +272,8 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 if (reg_no < 0 || reg_no > 15)
                     sh4asm_error("invalid floating-point register index %d",
                          reg_no);
-                struct tok tk = {
-                    .tp = TOK_FRN,
+                struct sh4asm_tok tk = {
+                    .tp = SH4ASM_TOK_FRN,
                     .val = { .reg_idx = reg_no }
                 };
                 emit(&tk);
@@ -284,8 +284,8 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 if (reg_no < 0 || reg_no > 15 || (reg_no & 1))
                     sh4asm_error("invalid double-precision floating-point "
                          "register index %d", reg_no);
-                struct tok tk = {
-                    .tp = TOK_DRN,
+                struct sh4asm_tok tk = {
+                    .tp = SH4ASM_TOK_DRN,
                     .val = { .reg_idx = reg_no }
                 };
                 emit(&tk);
@@ -296,8 +296,8 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 if (reg_no < 0 || reg_no > 15 || (reg_no & 1))
                     sh4asm_error("invalid banked double-precision floating-point "
                          "register index %d", reg_no);
-                struct tok tk = {
-                    .tp = TOK_XDN,
+                struct sh4asm_tok tk = {
+                    .tp = SH4ASM_TOK_XDN,
                     .val = { .reg_idx = reg_no }
                 };
                 emit(&tk);
@@ -308,8 +308,8 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 if (reg_no < 0 || reg_no > 15 || (reg_no & 3))
                     sh4asm_error("invalid floating-point vector register index "
                          "%d\n", reg_no);
-                struct tok tk = {
-                    .tp = TOK_FVN,
+                struct sh4asm_tok tk = {
+                    .tp = SH4ASM_TOK_FVN,
                     .val = { .reg_idx = reg_no }
                 };
                 emit(&tk);
@@ -323,8 +323,8 @@ void lexer_input_char(char ch, emit_tok_func emit) {
                 long val_as_long = strtol(cur_tok, NULL, 0);
                 if (errno)
                     sh4asm_error("unrecognized token \"%s\"", cur_tok);
-                struct tok tk = {
-                    .tp = TOK_DISP,
+                struct sh4asm_tok tk = {
+                    .tp = SH4ASM_TOK_DISP,
                     .val = { .as_int = val_as_long }
                 };
                 emit(&tk);
@@ -335,38 +335,38 @@ void lexer_input_char(char ch, emit_tok_func emit) {
 
         // don't forget the comma if that was the delimter that brought us here
         if (ch == ',') {
-            struct tok tk = {
-                .tp = TOK_COMMA
+            struct sh4asm_tok tk = {
+                .tp = SH4ASM_TOK_COMMA
             };
             emit(&tk);
         } else if (ch == '(') {
-            struct tok tk = {
-                .tp = TOK_OPENPAREN
+            struct sh4asm_tok tk = {
+                .tp = SH4ASM_TOK_OPENPAREN
             };
             emit(&tk);
         } else if (ch == ')') {
-            struct tok tk = {
-                .tp = TOK_CLOSEPAREN
+            struct sh4asm_tok tk = {
+                .tp = SH4ASM_TOK_CLOSEPAREN
             };
             emit(&tk);
         } else if (ch == '@') {
-            struct tok tk = {
-                .tp = TOK_AT
+            struct sh4asm_tok tk = {
+                .tp = SH4ASM_TOK_AT
             };
             emit(&tk);
         } else if (ch == '\n') {
-            struct tok tk = {
-                .tp = TOK_NEWLINE
+            struct sh4asm_tok tk = {
+                .tp = SH4ASM_TOK_NEWLINE
             };
             emit(&tk);
         } else if (ch == '+') {
-            struct tok tk = {
-                .tp = TOK_PLUS
+            struct sh4asm_tok tk = {
+                .tp = SH4ASM_TOK_PLUS
             };
             emit(&tk);
         } else if (ch == '-') {
-            struct tok tk = {
-                .tp = TOK_MINUS
+            struct sh4asm_tok tk = {
+                .tp = SH4ASM_TOK_MINUS
             };
             emit(&tk);
         }
@@ -375,44 +375,44 @@ void lexer_input_char(char ch, emit_tok_func emit) {
     }
 }
 
-char const *tok_as_str(struct tok const *tk) {
-    static char buf[TOK_LEN_MAX];
+char const *sh4asm_tok_as_str(struct sh4asm_tok const *tk) {
+    static char buf[SH4ASM_TOK_LEN_MAX];
 
-    if (tk->tp == TOK_IMM) {
-        snprintf(buf, TOK_LEN_MAX, "#0x%x", tk->val.as_int);
-        buf[TOK_LEN_MAX - 1] = '\0';
+    if (tk->tp == SH4ASM_TOK_IMM) {
+        snprintf(buf, SH4ASM_TOK_LEN_MAX, "#0x%x", tk->val.as_int);
+        buf[SH4ASM_TOK_LEN_MAX - 1] = '\0';
         return buf;
-    } else if (tk->tp == TOK_RN) {
-        snprintf(buf, TOK_LEN_MAX, "r%u", tk->val.reg_idx);
-        buf[TOK_LEN_MAX - 1] = '\0';
+    } else if (tk->tp == SH4ASM_TOK_RN) {
+        snprintf(buf, SH4ASM_TOK_LEN_MAX, "r%u", tk->val.reg_idx);
+        buf[SH4ASM_TOK_LEN_MAX - 1] = '\0';
         return buf;
-    } else if (tk->tp == TOK_RN_BANK) {
-        snprintf(buf, TOK_LEN_MAX, "r%u_bank", tk->val.reg_idx);
-        buf[TOK_LEN_MAX - 1] = '\0';
+    } else if (tk->tp == SH4ASM_TOK_RN_BANK) {
+        snprintf(buf, SH4ASM_TOK_LEN_MAX, "r%u_bank", tk->val.reg_idx);
+        buf[SH4ASM_TOK_LEN_MAX - 1] = '\0';
         return buf;
-    } else if (tk->tp == TOK_FRN) {
-        snprintf(buf, TOK_LEN_MAX, "fr%u", tk->val.reg_idx);
-        buf[TOK_LEN_MAX - 1] = '\0';
+    } else if (tk->tp == SH4ASM_TOK_FRN) {
+        snprintf(buf, SH4ASM_TOK_LEN_MAX, "fr%u", tk->val.reg_idx);
+        buf[SH4ASM_TOK_LEN_MAX - 1] = '\0';
         return buf;
-    } else if (tk->tp == TOK_DRN) {
-        snprintf(buf, TOK_LEN_MAX, "dr%u", tk->val.reg_idx);
-        buf[TOK_LEN_MAX - 1] = '\0';
+    } else if (tk->tp == SH4ASM_TOK_DRN) {
+        snprintf(buf, SH4ASM_TOK_LEN_MAX, "dr%u", tk->val.reg_idx);
+        buf[SH4ASM_TOK_LEN_MAX - 1] = '\0';
         return buf;
-    } else if (tk->tp == TOK_XDN) {
-        snprintf(buf, TOK_LEN_MAX, "xd%u", tk->val.reg_idx);
-        buf[TOK_LEN_MAX - 1] = '\0';
+    } else if (tk->tp == SH4ASM_TOK_XDN) {
+        snprintf(buf, SH4ASM_TOK_LEN_MAX, "xd%u", tk->val.reg_idx);
+        buf[SH4ASM_TOK_LEN_MAX - 1] = '\0';
         return buf;
-    } else if (tk->tp == TOK_FVN) {
-        snprintf(buf, TOK_LEN_MAX, "fv%u", tk->val.reg_idx);
-        buf[TOK_LEN_MAX - 1] = '\0';
+    } else if (tk->tp == SH4ASM_TOK_FVN) {
+        snprintf(buf, SH4ASM_TOK_LEN_MAX, "fv%u", tk->val.reg_idx);
+        buf[SH4ASM_TOK_LEN_MAX - 1] = '\0';
         return buf;
-    } else if (tk->tp == TOK_DISP) {
-        snprintf(buf, TOK_LEN_MAX, "0x%x", tk->val.as_int);
-        buf[TOK_LEN_MAX - 1] = '\0';
+    } else if (tk->tp == SH4ASM_TOK_DISP) {
+        snprintf(buf, SH4ASM_TOK_LEN_MAX, "0x%x", tk->val.as_int);
+        buf[SH4ASM_TOK_LEN_MAX - 1] = '\0';
         return buf;
     }
 
-    struct tok_mapping const *curs = tok_map;
+    struct sh4asm_tok_mapping const *curs = tok_map;
     while (curs->txt) {
         if (curs->tok == tk->tp)
             return curs->txt;
@@ -422,6 +422,6 @@ char const *tok_as_str(struct tok const *tk) {
     return NULL;
 }
 
-void lexer_reset(void) {
+void sh4asm_lexer_reset(void) {
     tok_len = 0;
 }

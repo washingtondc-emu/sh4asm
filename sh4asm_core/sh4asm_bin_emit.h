@@ -31,8 +31,8 @@
  *
  ******************************************************************************/
 
-#ifndef SH4_BIN_EMIT_H_
-#define SH4_BIN_EMIT_H_
+#ifndef SH4ASM_BIN_EMIT_H_
+#define SH4ASM_BIN_EMIT_H_
 
 #include <stdint.h>
 

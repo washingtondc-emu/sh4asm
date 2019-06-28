@@ -31,8 +31,8 @@
  *
  ******************************************************************************/
 
-#ifndef SH4_ASM_EMIT_H_
-#define SH4_ASM_EMIT_H_
+#ifndef SH4ASM_TXT_EMIT_H_
+#define SH4ASM_TXT_EMIT_H_
 
 #include <stdio.h>
 

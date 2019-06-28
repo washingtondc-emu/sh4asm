@@ -61,7 +61,7 @@ static void sh4asm_disas_inst(uint16_t inst, sh4asm_disas_emit_func em);
  ******************************************************************************/
 
 static void sh4asm_opcode_non_inst_(unsigned const *quads, sh4asm_disas_emit_func em) {
-#define NON_INST_BUF_LEN 16
+#define NON_INST_BUF_LEN 64
     char buf[NON_INST_BUF_LEN];
     memset(buf, 0, sizeof(buf));
     // TODO: make sure the quads get printed in the right order

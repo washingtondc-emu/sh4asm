@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2017, snickerbockers <chimerasaurusrex@gmail.com>
+ * Copyright (c) 2017, 2019 snickerbockers <chimerasaurusrex@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -33,77 +33,77 @@
 
 #include "sh4_bin_emit.h"
 
-void emit_bin_inst(emit_bin_handler_func emit, uint16_t inst) {
+void sh4asm_bin_emit_inst(sh4asm_bin_emit_handler_func emit, uint16_t inst) {
     emit(inst);
 }
 
-uint16_t assemble_bin_noarg(uint16_t opcode) {
+uint16_t sh4asm_bin_assemblenoarg(uint16_t opcode) {
     return opcode;
 }
 
-uint16_t assemble_bin_rn(uint16_t opcode, unsigned rn) {
+uint16_t sh4asm_bin_assemblern(uint16_t opcode, unsigned rn) {
     return opcode | (uint16_t)((rn & 15) << 8);
 }
 
-uint16_t assemble_bin_imm8(uint16_t opcode, unsigned imm8) {
+uint16_t sh4asm_bin_assembleimm8(uint16_t opcode, unsigned imm8) {
     return opcode | (uint16_t)(imm8 & 0xff);
 }
 
-uint16_t assemble_bin_imm12(uint16_t opcode, unsigned imm12) {
+uint16_t sh4asm_bin_assembleimm12(uint16_t opcode, unsigned imm12) {
     return opcode | (uint16_t)(imm12 & 0xfff);
 }
 
-uint16_t assemble_bin_rn_imm8(uint16_t opcode, unsigned rn, unsigned imm8) {
+uint16_t sh4asm_bin_assemblern_imm8(uint16_t opcode, unsigned rn, unsigned imm8) {
     return opcode | (uint16_t)((rn & 15) << 8) | (uint16_t)(imm8 & 0xff);
 }
 
-uint16_t assemble_bin_rm_rn(uint16_t opcode, unsigned rm, unsigned rn) {
+uint16_t sh4asm_bin_assemblerm_rn(uint16_t opcode, unsigned rm, unsigned rn) {
     return opcode | (uint16_t)((rm & 15) << 4) | (uint16_t)((rn & 15) << 8);
 }
 
-uint16_t assemble_bin_rm_rn_bank(uint16_t opcode,
+uint16_t sh4asm_bin_assemblerm_rn_bank(uint16_t opcode,
                                 unsigned rm, unsigned rn_bank) {
     return opcode | (uint16_t)((rm & 15) << 8) | (uint16_t)((rn_bank & 7) << 4);
 }
 
-uint16_t assemble_bin_rn_imm4(uint16_t opcode, unsigned rn, unsigned imm4) {
+uint16_t sh4asm_bin_assemblern_imm4(uint16_t opcode, unsigned rn, unsigned imm4) {
     return opcode | (uint16_t)((rn & 15) << 4) | (uint16_t)(imm4 & 15);
 }
 
-uint16_t assemble_bin_rm_rn_imm4(uint16_t opcode, unsigned rm,
+uint16_t sh4asm_bin_assemblerm_rn_imm4(uint16_t opcode, unsigned rm,
                                  unsigned rn, unsigned imm4) {
     return opcode | (uint16_t)(imm4 & 15) | (uint16_t)((rm & 15) << 4) |
         (uint16_t)((rn & 15) << 8);
 }
 
-uint16_t assemble_bin_drm_drn(uint16_t opcode, unsigned drm, unsigned drn) {
+uint16_t sh4asm_bin_assembledrm_drn(uint16_t opcode, unsigned drm, unsigned drn) {
     drm = (drm >> 1) & 7;
     drn = (drn >> 1) & 7;
     return opcode | (uint16_t)(drm << 5) | (uint16_t)(drn << 9);
 }
 
-uint16_t assemble_bin_rm_drn(uint16_t opcode, unsigned rm, unsigned drn) {
+uint16_t sh4asm_bin_assemblerm_drn(uint16_t opcode, unsigned rm, unsigned drn) {
     drn = (drn >> 1) & 7;
     return opcode | (uint16_t)((rm & 15) << 4) | (unsigned)(drn << 9);
 }
 
-uint16_t assemble_bin_drm_rn(uint16_t opcode, unsigned drm, unsigned rn) {
+uint16_t sh4asm_bin_assembledrm_rn(uint16_t opcode, unsigned drm, unsigned rn) {
     drm = (drm >> 1) & 7;
     return opcode | (uint16_t)((rn & 15) << 8) | (uint16_t)(drm << 5);
 }
 
-uint16_t assemble_bin_drn(uint16_t opcode, unsigned drn) {
+uint16_t sh4asm_bin_assembledrn(uint16_t opcode, unsigned drn) {
     drn = (drn >> 1) & 7;
     return opcode | (uint16_t)(drn << 9);
 }
 
-uint16_t assemble_bin_fvm_fvn(uint16_t opcode, unsigned fvm, unsigned fvn) {
+uint16_t sh4asm_bin_assemblefvm_fvn(uint16_t opcode, unsigned fvm, unsigned fvn) {
     fvm = (fvm >> 2) & 3;
     fvn = (fvn >> 2) & 3;
     return opcode | (uint16_t)(fvm << 8) | (uint16_t)(fvn << 10);
 }
 
-uint16_t assemble_bin_fvn(uint16_t opcode, unsigned fvn) {
+uint16_t sh4asm_bin_assemblefvn(uint16_t opcode, unsigned fvn) {
     fvn = (fvn >> 2) & 3;
     return opcode | (uint16_t)(fvn << 10);
 }

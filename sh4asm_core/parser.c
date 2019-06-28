@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2017, snickerbockers <chimerasaurusrex@gmail.com>
+ * Copyright (c) 2017, 2019 snickerbockers <chimerasaurusrex@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -114,13 +114,13 @@ static void do_check_fvn(unsigned tok_idx, unsigned line, char const *file) {
              "index %u (see line %d of %s)", reg_idx, line, file);
 }
 
-static emit_bin_handler_func emit;
+static sh4asm_bin_emit_handler_func emit;
 
 typedef void(*parser_emit_func)(void);
 
 #define OP_NOARG(op)                            \
     static void emit_##op(void) {               \
-        sh4_bin_##op(emit);                     \
+        sh4asm_bin_##op(emit);                     \
     }
 
 OP_NOARG(div0u)
@@ -141,7 +141,7 @@ OP_NOARG(fschg)
     static void emit_##op##_rn(void) {          \
         CHECK_RN(1);                            \
         int reg_no = tokens[1].val.reg_idx;     \
-        sh4_bin_##op##_rn(emit, reg_no);        \
+        sh4asm_bin_##op##_rn(emit, reg_no);        \
     }
 
 OP_RN(movt)
@@ -169,7 +169,7 @@ OP_RN(bsrf)
     static void emit_##op##_arn(void) {         \
         CHECK_RN(2);                            \
         int reg_no = tokens[2].val.reg_idx;     \
-        sh4_bin_##op##_arn(emit, reg_no);       \
+        sh4asm_bin_##op##_arn(emit, reg_no);       \
     }
 
 OP_ARN(tasb)
@@ -184,7 +184,7 @@ OP_ARN(jsr)
     static void emit_##op##_rm_##reg(void) {    \
         CHECK_RN(1);                            \
         int reg_no = tokens[1].val.reg_idx;     \
-        sh4_bin_##op##_rm_##reg(emit, reg_no);  \
+        sh4asm_bin_##op##_rm_##reg(emit, reg_no);  \
     }
 
 OP_RM_REG(ldc, sr)
@@ -203,7 +203,7 @@ OP_RM_REG(lds, fpul)
     static void emit_##op##_##reg##_rn(void) {      \
         CHECK_RN(3);                                \
         int reg_no = tokens[3].val.reg_idx;         \
-        sh4_bin_##op##_##reg##_rn(emit, reg_no);    \
+        sh4asm_bin_##op##_##reg##_rn(emit, reg_no);    \
     }
 
 OP_REG_RN(stc, sr)
@@ -223,7 +223,7 @@ OP_REG_RN(sts, fpul)
     static void emit_##op##_armp_##reg(void) {      \
         CHECK_RN(2);                                \
         int reg_no = tokens[2].val.reg_idx;         \
-        sh4_bin_##op##_armp_##reg(emit, reg_no);    \
+        sh4asm_bin_##op##_armp_##reg(emit, reg_no);    \
     }
 
 OP_ARMP_REG(ldcl, sr)
@@ -242,7 +242,7 @@ OP_ARMP_REG(ldsl, fpul)
     static void emit_##op##_##reg##_amrn(void)  {   \
         CHECK_RN(5);                                \
         int reg_no = tokens[5].val.reg_idx;         \
-        sh4_bin_##op##_##reg##_amrn(emit, reg_no);  \
+        sh4asm_bin_##op##_##reg##_amrn(emit, reg_no);  \
     }
 
 OP_REG_AMRN(stcl, sr)
@@ -263,7 +263,7 @@ OP_REG_AMRN(stsl, fpul)
         CHECK_RN(4);                                                    \
         CHECK_R0(1);                                                    \
         int reg_no = tokens[4].val.reg_idx;                             \
-        sh4_bin_##op##_r0_arn(emit, reg_no);                            \
+        sh4asm_bin_##op##_r0_arn(emit, reg_no);                            \
     }
 
 OP_R0_ARN(movcal)
@@ -272,7 +272,7 @@ OP_R0_ARN(movcal)
     static void emit_##op##_frn(void) {                                 \
         CHECK_FRN(1);                                                   \
         int reg_no = tokens[1].val.reg_idx;                             \
-        sh4_bin_##op##_frn(emit, reg_no);                               \
+        sh4asm_bin_##op##_frn(emit, reg_no);                               \
     }
 
 OP_FRN(fldi0)
@@ -286,7 +286,7 @@ OP_FRN(fsrra)
     static void emit_##op##_frm_##reg(void) {   \
         CHECK_FRN(1);                           \
         int reg_no = tokens[1].val.reg_idx;     \
-        sh4_bin_##op##_frm_##reg(emit, reg_no); \
+        sh4asm_bin_##op##_frm_##reg(emit, reg_no); \
     }
 
 OP_FRM_REG(flds, fpul)
@@ -296,7 +296,7 @@ OP_FRM_REG(ftrc, fpul)
     static void emit_##op##_##reg##_frn(void) {     \
         CHECK_FRN(3);                               \
         int reg_no = tokens[3].val.reg_idx;         \
-        sh4_bin_##op##_##reg##_frn(emit, reg_no);   \
+        sh4asm_bin_##op##_##reg##_frn(emit, reg_no);   \
     }
 
 OP_REG_FRN(fsts, fpul)
@@ -307,7 +307,7 @@ OP_REG_FRN(float, fpul)
         CHECK_R0(3);                            \
         CHECK_IMM(1);                           \
         int imm_val = tokens[1].val.as_int;     \
-        sh4_bin_##op##_imm8_r0(emit, imm_val);  \
+        sh4asm_bin_##op##_imm8_r0(emit, imm_val);  \
     }
 
 OP_IMM8_R0(cmpeq)
@@ -321,7 +321,7 @@ OP_IMM8_R0(xor)
         CHECK_IMM(1);                                   \
         CHECK_R0(5);                                    \
         int imm_val = tokens[1].val.as_int;             \
-        sh4_bin_##op##_imm8_a_r0_##reg(emit, imm_val);  \
+        sh4asm_bin_##op##_imm8_a_r0_##reg(emit, imm_val);  \
     }
 
 OP_IMM8_A_R0_REG(andb, gbr)
@@ -333,7 +333,7 @@ OP_IMM8_A_R0_REG(xorb, gbr)
     static void emit_##op##_offs8(void) {       \
         CHECK_DISP(1);                          \
         int disp_val = tokens[1].val.as_int;    \
-        sh4_bin_##op##_offs8(emit, disp_val);   \
+        sh4asm_bin_##op##_offs8(emit, disp_val);   \
     }
 
 OP_OFFS8(bf)
@@ -345,7 +345,7 @@ OP_OFFS8(bts)
     static void emit_##op##_imm8(void) {        \
         CHECK_IMM(1);                           \
         int imm_val = tokens[1].val.as_int;     \
-        sh4_bin_##op##_imm8(emit, imm_val);     \
+        sh4asm_bin_##op##_imm8(emit, imm_val);     \
     }
 
 OP_IMM8(trapa);
@@ -355,7 +355,7 @@ OP_IMM8(trapa);
         CHECK_R0(1);                                        \
         CHECK_DISP(5);                                      \
         int disp_val = tokens[5].val.as_int;                \
-        sh4_bin_##op##_r0_a_disp8_##reg(emit, disp_val);    \
+        sh4asm_bin_##op##_r0_a_disp8_##reg(emit, disp_val);    \
     }
 
 OP_R0_A_DISP8_REG(movb, gbr)
@@ -367,7 +367,7 @@ OP_R0_A_DISP8_REG(movl, gbr)
         CHECK_R0(8);                                        \
         CHECK_DISP(3);                                      \
         int disp_val = tokens[3].val.as_int;                \
-        sh4_bin_##op##_a_disp8_##reg##_r0(emit, disp_val);  \
+        sh4asm_bin_##op##_a_disp8_##reg##_r0(emit, disp_val);  \
     }
 
 OP_A_DISP8_REG_R0(movb, gbr)
@@ -379,7 +379,7 @@ OP_A_DISP8_REG_R0(movl, gbr)
         CHECK_R0(8);                                        \
         CHECK_DISP(3);                                      \
         int disp_val = tokens[3].val.as_int;                \
-        sh4_bin_##op##_a_offs8_##reg##_r0(emit, disp_val);  \
+        sh4asm_bin_##op##_a_offs8_##reg##_r0(emit, disp_val);  \
     }
 
 OP_A_OFFS8_REG_R0(mova, pc)
@@ -388,7 +388,7 @@ OP_A_OFFS8_REG_R0(mova, pc)
     static void emit_##op##_offs12(void) {      \
         CHECK_DISP(1);                          \
         int disp_val = tokens[1].val.as_int;    \
-        sh4_bin_##op##_offs12(emit, disp_val);  \
+        sh4asm_bin_##op##_offs12(emit, disp_val);  \
     }
 
 OP_OFFS12(bra)
@@ -400,7 +400,7 @@ OP_OFFS12(bsr)
         CHECK_RN(3);                                    \
         int imm_val = tokens[1].val.as_int;             \
         int reg_no = tokens[3].val.reg_idx;             \
-        sh4_bin_##op##_imm8_rn(emit, imm_val, reg_no);  \
+        sh4asm_bin_##op##_imm8_rn(emit, imm_val, reg_no);  \
     }
 
 OP_IMM8_RN(mov)
@@ -412,7 +412,7 @@ OP_IMM8_RN(add)
         CHECK_RN(8);                                                \
         int disp_val = tokens[3].val.as_int;                        \
         int reg_no = tokens[8].val.reg_idx;                         \
-        sh4_bin_##op##_a_offs8_##reg##_rn(emit, disp_val, reg_no);  \
+        sh4asm_bin_##op##_a_offs8_##reg##_rn(emit, disp_val, reg_no);  \
     }
 
 OP_A_OFFS8_REG_RN(movw, pc)
@@ -424,7 +424,7 @@ OP_A_OFFS8_REG_RN(movl, pc)
         CHECK_RN(3);                                \
         int rm_no = tokens[1].val.as_int;           \
         int rn_no = tokens[3].val.as_int;           \
-        sh4_bin_##op##_rm_rn(emit, rm_no, rn_no);   \
+        sh4asm_bin_##op##_rm_rn(emit, rm_no, rn_no);   \
     }
 
 OP_RM_RN(mov)
@@ -471,7 +471,7 @@ OP_RM_RN(shld)
         CHECK_RN(7);                                     \
         int rm_no = tokens[1].val.reg_idx;               \
         int rn_no = tokens[7].val.reg_idx;               \
-        sh4_bin_##op##_rm_a_r0_rn(emit, rm_no, rn_no);   \
+        sh4asm_bin_##op##_rm_a_r0_rn(emit, rm_no, rn_no);   \
     }
 
 OP_RM_A_R0_RN(movb)
@@ -485,7 +485,7 @@ OP_RM_A_R0_RN(movl)
         CHECK_RN(8);                                     \
         int rm_no = tokens[5].val.reg_idx;               \
         int rn_no = tokens[8].val.reg_idx;               \
-        sh4_bin_##op##_a_r0_rm_rn(emit, rm_no, rn_no);   \
+        sh4asm_bin_##op##_a_r0_rm_rn(emit, rm_no, rn_no);   \
     }
 
 OP_A_R0_RM_RN(movb)
@@ -498,7 +498,7 @@ OP_A_R0_RM_RN(movl)
         CHECK_RN(4);                                     \
         int rm_no = tokens[1].val.reg_idx;               \
         int rn_no = tokens[4].val.reg_idx;               \
-        sh4_bin_##op##_rm_arn(emit, rm_no, rn_no);       \
+        sh4asm_bin_##op##_rm_arn(emit, rm_no, rn_no);       \
     }
 
 OP_RM_ARN(movb)
@@ -511,7 +511,7 @@ OP_RM_ARN(movl)
         CHECK_RN(4);                                     \
         int rm_no = tokens[2].val.reg_idx;               \
         int rn_no = tokens[4].val.reg_idx;               \
-        sh4_bin_##op##_arm_rn(emit, rm_no, rn_no);       \
+        sh4asm_bin_##op##_arm_rn(emit, rm_no, rn_no);       \
     }
 
 OP_ARM_RN(movb)
@@ -524,7 +524,7 @@ OP_ARM_RN(movl)
         CHECK_RN(5);                                      \
         int rm_no = tokens[1].val.reg_idx;                \
         int rn_no = tokens[5].val.reg_idx;                \
-        sh4_bin_##op##_rm_amrn(emit, rm_no, rn_no);       \
+        sh4asm_bin_##op##_rm_amrn(emit, rm_no, rn_no);       \
     }
 
 OP_RM_AMRN(movb)
@@ -537,7 +537,7 @@ OP_RM_AMRN(movl)
         CHECK_RN(5);                                      \
         int rm_no = tokens[2].val.reg_idx;                \
         int rn_no = tokens[5].val.reg_idx;                \
-        sh4_bin_##op##_armp_rn(emit, rm_no, rn_no);       \
+        sh4asm_bin_##op##_armp_rn(emit, rm_no, rn_no);       \
     }
 
 OP_ARMP_RN(movb)
@@ -550,7 +550,7 @@ OP_ARMP_RN(movl)
         CHECK_RN(6);                                        \
         int rm_no = tokens[2].val.reg_idx;                  \
         int rn_no = tokens[6].val.reg_idx;                  \
-        sh4_bin_##op##_armp_arnp(emit, rm_no, rn_no);       \
+        sh4asm_bin_##op##_armp_arnp(emit, rm_no, rn_no);       \
     }
 
 OP_ARMP_ARNP(macw)
@@ -562,7 +562,7 @@ OP_ARMP_ARNP(macl)
         CHECK_FRN(3);                                        \
         int frm_no = tokens[1].val.reg_idx;                  \
         int frn_no = tokens[3].val.reg_idx;                  \
-        sh4_bin_##op##_frm_frn(emit, frm_no, frn_no);        \
+        sh4asm_bin_##op##_frm_frn(emit, frm_no, frn_no);        \
     }
 
 OP_FRM_FRN(fmov)
@@ -579,7 +579,7 @@ OP_FRM_FRN(fsub)
         CHECK_FRN(4);                                   \
         int rm_no = tokens[2].val.reg_idx;              \
         int frn_no = tokens[4].val.reg_idx;             \
-        sh4_bin_##op##_arm_frn(emit, rm_no, frn_no);    \
+        sh4asm_bin_##op##_arm_frn(emit, rm_no, frn_no);    \
     }
 
 OP_ARM_FRN(fmovs)
@@ -591,7 +591,7 @@ OP_ARM_FRN(fmovs)
         CHECK_FRN(8);                                       \
         int rm_no = tokens[5].val.reg_idx;                  \
         int frn_no = tokens[8].val.reg_idx;                 \
-        sh4_bin_##op##_a_r0_rm_frn(emit, rm_no, frn_no);    \
+        sh4asm_bin_##op##_a_r0_rm_frn(emit, rm_no, frn_no);    \
     }
 
 OP_A_R0_RM_FRN(fmovs)
@@ -602,7 +602,7 @@ OP_A_R0_RM_FRN(fmovs)
         CHECK_FRN(5);                                   \
         int rm_no = tokens[2].val.reg_idx;              \
         int frn_no = tokens[5].val.reg_idx;             \
-        sh4_bin_##op##_armp_frn(emit, rm_no, frn_no);   \
+        sh4asm_bin_##op##_armp_frn(emit, rm_no, frn_no);   \
     }
 
 OP_ARMP_FRN(fmovs)
@@ -613,7 +613,7 @@ OP_ARMP_FRN(fmovs)
         CHECK_RN(4);                                    \
         int rn_no = tokens[4].val.reg_idx;              \
         int frm_no = tokens[1].val.reg_idx;             \
-        sh4_bin_##op##_frm_arn(emit, frm_no, rn_no);    \
+        sh4asm_bin_##op##_frm_arn(emit, frm_no, rn_no);    \
     }
 
 OP_FRM_ARN(fmovs)
@@ -624,7 +624,7 @@ OP_FRM_ARN(fmovs)
         CHECK_RN(5);                                    \
         int rn_no = tokens[5].val.reg_idx;              \
         int frm_no = tokens[1].val.reg_idx;             \
-        sh4_bin_##op##_frm_amrn(emit, frm_no, rn_no);   \
+        sh4asm_bin_##op##_frm_amrn(emit, frm_no, rn_no);   \
     }
 
 OP_FRM_AMRN(fmovs)
@@ -636,7 +636,7 @@ OP_FRM_AMRN(fmovs)
         CHECK_RN(7);                                        \
         int rn_no = tokens[7].val.reg_idx;                  \
         int frm_no = tokens[1].val.reg_idx;                 \
-        sh4_bin_##op##_frm_a_r0_rn(emit, frm_no, rn_no);    \
+        sh4asm_bin_##op##_frm_a_r0_rn(emit, frm_no, rn_no);    \
     }
 
 OP_FRM_A_R0_RN(fmovs)
@@ -648,7 +648,7 @@ OP_FRM_A_R0_RN(fmovs)
         CHECK_FRN(5);                                       \
         int frm_no = tokens[3].val.reg_idx;                 \
         int frn_no = tokens[5].val.reg_idx;                 \
-        sh4_bin_##op##_fr0_frm_frn(emit, frm_no, frn_no);   \
+        sh4asm_bin_##op##_fr0_frm_frn(emit, frm_no, frn_no);   \
     }
 
 OP_FR0_FRM_FRN(fmac)
@@ -659,7 +659,7 @@ OP_FR0_FRM_FRN(fmac)
         CHECK_RN_BANK(3);                                   \
         int rm_no = tokens[1].val.reg_idx;                  \
         int rn_bank_no = tokens[3].val.reg_idx;             \
-        sh4_bin_##op##_rm_rn_bank(emit, rm_no, rn_bank_no); \
+        sh4asm_bin_##op##_rm_rn_bank(emit, rm_no, rn_bank_no); \
     }
 
 OP_RM_RN_BANK(ldc)
@@ -670,7 +670,7 @@ OP_RM_RN_BANK(ldc)
         CHECK_RN(3);                                        \
         int rm_bank_no = tokens[1].val.reg_idx;             \
         int rn_no = tokens[3].val.reg_idx;                  \
-        sh4_bin_##op##_rm_bank_rn(emit, rm_bank_no, rn_no); \
+        sh4asm_bin_##op##_rm_bank_rn(emit, rm_bank_no, rn_no); \
     }
 
 OP_RM_BANK_RN(stc)
@@ -681,7 +681,7 @@ OP_RM_BANK_RN(stc)
         CHECK_RN_BANK(5);                                       \
         int rm_no = tokens[2].val.reg_idx;                      \
         int rn_bank_no = tokens[5].val.reg_idx;                 \
-        sh4_bin_##op##_armp_rn_bank(emit, rm_no, rn_bank_no);   \
+        sh4asm_bin_##op##_armp_rn_bank(emit, rm_no, rn_bank_no);   \
     }
 
 OP_ARMP_RN_BANK(ldcl)
@@ -692,7 +692,7 @@ OP_ARMP_RN_BANK(ldcl)
         CHECK_RN(5);                                            \
         int rm_bank_no = tokens[1].val.reg_idx;                 \
         int rn_no = tokens[5].val.reg_idx;                      \
-        sh4_bin_##op##_rm_bank_amrn(emit, rm_bank_no, rn_no);   \
+        sh4asm_bin_##op##_rm_bank_amrn(emit, rm_bank_no, rn_no);   \
     }
 
 OP_RM_BANK_AMRN(stcl)
@@ -704,7 +704,7 @@ OP_RM_BANK_AMRN(stcl)
         CHECK_RN(7);                                                \
         int disp_val = tokens[5].val.as_int;                        \
         int reg_no = tokens[7].val.reg_idx;                         \
-        sh4_bin_##op##_r0_a_disp4_rn(emit, disp_val, reg_no);       \
+        sh4asm_bin_##op##_r0_a_disp4_rn(emit, disp_val, reg_no);       \
     }
 
 OP_R0_A_DISP4_RN(movb)
@@ -717,7 +717,7 @@ OP_R0_A_DISP4_RN(movw)
         CHECK_R0(8);                                            \
         int disp_val = tokens[3].val.as_int;                    \
         int reg_no = tokens[5].val.reg_idx;                     \
-        sh4_bin_##op##_a_disp4_rm_r0(emit, disp_val, reg_no);   \
+        sh4asm_bin_##op##_a_disp4_rm_r0(emit, disp_val, reg_no);   \
     }
 
 OP_A_DISP4_RM_R0(movb)
@@ -731,7 +731,7 @@ OP_A_DISP4_RM_R0(movw)
         int src_reg = tokens[1].val.reg_idx;                            \
         int disp_val = tokens[5].val.as_int;                            \
         int dst_reg = tokens[7].val.reg_idx;                            \
-        sh4_bin_##op##_rm_a_disp4_rn(emit, src_reg, disp_val, dst_reg); \
+        sh4asm_bin_##op##_rm_a_disp4_rn(emit, src_reg, disp_val, dst_reg); \
     }
 
 OP_RM_A_DISP4_RN(movl)
@@ -744,7 +744,7 @@ OP_RM_A_DISP4_RN(movl)
         int disp_val = tokens[3].val.as_int;                            \
         int src_reg = tokens[5].val.reg_idx;                            \
         int dst_reg = tokens[8].val.reg_idx;                            \
-        sh4_bin_##op##_a_disp4_rm_rn(emit, disp_val, src_reg, dst_reg); \
+        sh4asm_bin_##op##_a_disp4_rm_rn(emit, disp_val, src_reg, dst_reg); \
     }
 
 OP_A_DISP4_RM_RN(movl)
@@ -755,7 +755,7 @@ OP_A_DISP4_RM_RN(movl)
         CHECK_DRN(3);                                   \
         int src_reg = tokens[1].val.reg_idx;            \
         int dst_reg = tokens[3].val.reg_idx;            \
-        sh4_bin_##op##_drm_drn(emit, src_reg, dst_reg); \
+        sh4asm_bin_##op##_drm_drn(emit, src_reg, dst_reg); \
     }
 
 OP_DRM_DRN(fmov)
@@ -772,7 +772,7 @@ OP_DRM_DRN(fsub)
         CHECK_XDN(3);                                       \
         int src_reg = tokens[1].val.reg_idx;                \
         int dst_reg = tokens[3].val.reg_idx;                \
-        sh4_bin_##op##_drm_xdn(emit, src_reg, dst_reg);     \
+        sh4asm_bin_##op##_drm_xdn(emit, src_reg, dst_reg);     \
     }
 
 OP_DRM_XDN(fmov)
@@ -783,7 +783,7 @@ OP_DRM_XDN(fmov)
         CHECK_DRN(3);                                       \
         int src_reg = tokens[1].val.reg_idx;                \
         int dst_reg = tokens[3].val.reg_idx;                \
-        sh4_bin_##op##_xdm_drn(emit, src_reg, dst_reg);     \
+        sh4asm_bin_##op##_xdm_drn(emit, src_reg, dst_reg);     \
     }
 
 OP_XDM_DRN(fmov)
@@ -794,7 +794,7 @@ OP_XDM_DRN(fmov)
         CHECK_XDN(3);                                       \
         int src_reg = tokens[1].val.reg_idx;                \
         int dst_reg = tokens[3].val.reg_idx;                \
-        sh4_bin_##op##_xdm_xdn(emit, src_reg, dst_reg);     \
+        sh4asm_bin_##op##_xdm_xdn(emit, src_reg, dst_reg);     \
     }
 
 OP_XDM_XDN(fmov)
@@ -805,7 +805,7 @@ OP_XDM_XDN(fmov)
         CHECK_DRN(4);                                   \
         int src_reg = tokens[2].val.reg_idx;            \
         int dst_reg = tokens[4].val.reg_idx;            \
-        sh4_bin_##op##_arm_drn(emit, src_reg, dst_reg); \
+        sh4asm_bin_##op##_arm_drn(emit, src_reg, dst_reg); \
     }
 
 OP_ARM_DRN(fmov)
@@ -817,7 +817,7 @@ OP_ARM_DRN(fmov)
         CHECK_DRN(8);                                       \
         int src_reg = tokens[5].val.reg_idx;                \
         int dst_reg = tokens[8].val.reg_idx;                \
-        sh4_bin_##op##_a_r0_rm_drn(emit, src_reg, dst_reg); \
+        sh4asm_bin_##op##_a_r0_rm_drn(emit, src_reg, dst_reg); \
     }
 
 OP_A_R0_RM_DRN(fmov)
@@ -828,7 +828,7 @@ OP_A_R0_RM_DRN(fmov)
         CHECK_DRN(5);                                       \
         int src_reg = tokens[2].val.reg_idx;                \
         int dst_reg = tokens[5].val.reg_idx;                \
-        sh4_bin_##op##_armp_drn(emit, src_reg, dst_reg);    \
+        sh4asm_bin_##op##_armp_drn(emit, src_reg, dst_reg);    \
     }
 
 OP_ARMP_DRN(fmov)
@@ -839,7 +839,7 @@ OP_ARMP_DRN(fmov)
         CHECK_XDN(4);                                   \
         int src_reg = tokens[2].val.reg_idx;            \
         int dst_reg = tokens[4].val.reg_idx;            \
-        sh4_bin_##op##_arm_xdn(emit, src_reg, dst_reg); \
+        sh4asm_bin_##op##_arm_xdn(emit, src_reg, dst_reg); \
     }
 
 OP_ARM_XDN(fmov)
@@ -850,7 +850,7 @@ OP_ARM_XDN(fmov)
         CHECK_XDN(5);                                       \
         int src_reg = tokens[2].val.reg_idx;                \
         int dst_reg = tokens[5].val.reg_idx;                \
-        sh4_bin_##op##_armp_xdn(emit, src_reg, dst_reg);    \
+        sh4asm_bin_##op##_armp_xdn(emit, src_reg, dst_reg);    \
     }
 
 OP_ARMP_XDN(fmov)
@@ -862,7 +862,7 @@ OP_ARMP_XDN(fmov)
         CHECK_XDN(8);                                       \
         int src_reg = tokens[5].val.reg_idx;                \
         int dst_reg = tokens[8].val.reg_idx;                \
-        sh4_bin_##op##_a_r0_rm_xdn(emit, src_reg, dst_reg); \
+        sh4asm_bin_##op##_a_r0_rm_xdn(emit, src_reg, dst_reg); \
     }
 
 OP_A_R0_RM_XDN(fmov)
@@ -873,7 +873,7 @@ OP_A_R0_RM_XDN(fmov)
         CHECK_RN(4);                                        \
         int src_reg = tokens[1].val.reg_idx;                \
         int dst_reg = tokens[4].val.reg_idx;                \
-        sh4_bin_##op##_drm_arn(emit, src_reg, dst_reg);     \
+        sh4asm_bin_##op##_drm_arn(emit, src_reg, dst_reg);     \
     }
 
 OP_DRM_ARN(fmov)
@@ -884,7 +884,7 @@ OP_DRM_ARN(fmov)
         CHECK_RN(5);                                         \
         int src_reg = tokens[1].val.reg_idx;                 \
         int dst_reg = tokens[5].val.reg_idx;                 \
-        sh4_bin_##op##_drm_amrn(emit, src_reg, dst_reg);     \
+        sh4asm_bin_##op##_drm_amrn(emit, src_reg, dst_reg);     \
     }
 
 OP_DRM_AMRN(fmov)
@@ -896,7 +896,7 @@ OP_DRM_AMRN(fmov)
         CHECK_RN(7);                                        \
         int src_reg = tokens[1].val.reg_idx;                \
         int dst_reg = tokens[7].val.reg_idx;                \
-        sh4_bin_##op##_drm_a_r0_rn(emit, src_reg, dst_reg); \
+        sh4asm_bin_##op##_drm_a_r0_rn(emit, src_reg, dst_reg); \
     }
 
 OP_DRM_A_R0_RN(fmov)
@@ -907,7 +907,7 @@ OP_DRM_A_R0_RN(fmov)
         CHECK_RN(4);                                        \
         int src_reg = tokens[1].val.reg_idx;                \
         int dst_reg = tokens[4].val.reg_idx;                \
-        sh4_bin_##op##_xdm_arn(emit, src_reg, dst_reg);     \
+        sh4asm_bin_##op##_xdm_arn(emit, src_reg, dst_reg);     \
     }
 
 OP_XDM_ARN(fmov)
@@ -918,7 +918,7 @@ OP_XDM_ARN(fmov)
         CHECK_RN(5);                                         \
         int src_reg = tokens[1].val.reg_idx;                 \
         int dst_reg = tokens[5].val.reg_idx;                 \
-        sh4_bin_##op##_xdm_amrn(emit, src_reg, dst_reg);     \
+        sh4asm_bin_##op##_xdm_amrn(emit, src_reg, dst_reg);     \
     }
 
 OP_XDM_AMRN(fmov)
@@ -930,7 +930,7 @@ OP_XDM_AMRN(fmov)
         CHECK_RN(7);                                        \
         int src_reg = tokens[1].val.reg_idx;                \
         int dst_reg = tokens[7].val.reg_idx;                \
-        sh4_bin_##op##_xdm_a_r0_rn(emit, src_reg, dst_reg); \
+        sh4asm_bin_##op##_xdm_a_r0_rn(emit, src_reg, dst_reg); \
     }
 
 OP_XDM_A_R0_RN(fmov)
@@ -939,7 +939,7 @@ OP_XDM_A_R0_RN(fmov)
     static void emit_##op##_drn(void) {         \
         CHECK_DRN(1);                           \
         int src_reg = tokens[1].val.reg_idx;    \
-        sh4_bin_##op##_drn(emit, src_reg);      \
+        sh4asm_bin_##op##_drn(emit, src_reg);      \
     }
 
 OP_DRN(fabs)
@@ -950,7 +950,7 @@ OP_DRN(fsqrt)
     static void emit_##op##_drm_fpul(void) {    \
         CHECK_DRN(1);                           \
         int src_reg = tokens[1].val.reg_idx;    \
-        sh4_bin_##op##_drm_fpul(emit, src_reg); \
+        sh4asm_bin_##op##_drm_fpul(emit, src_reg); \
     }
 
 OP_DRM_FPUL(fcnvds)
@@ -960,7 +960,7 @@ OP_DRM_FPUL(ftrc)
     static void emit_##op##_fpul_drn(void) {    \
         CHECK_DRN(3);                           \
         int src_reg = tokens[3].val.reg_idx;    \
-        sh4_bin_##op##_fpul_drn(emit, src_reg); \
+        sh4asm_bin_##op##_fpul_drn(emit, src_reg); \
     }
 
 OP_FPUL_DRN(fcnvsd)
@@ -973,7 +973,7 @@ OP_FPUL_DRN(fsca)
         CHECK_FVN(3);                                   \
         int src_reg = tokens[1].val.reg_idx;            \
         int dst_reg = tokens[3].val.reg_idx;            \
-        sh4_bin_##op##_fvm_fvn(emit, src_reg, dst_reg); \
+        sh4asm_bin_##op##_fvm_fvn(emit, src_reg, dst_reg); \
     }
 
 OP_FVM_FVN(fipr)
@@ -982,7 +982,7 @@ OP_FVM_FVN(fipr)
     static void emit_##op##_xmtrx_fvn(void) {   \
         CHECK_FVN(3);                           \
         int reg_no = tokens[3].val.reg_idx;     \
-        sh4_bin_##op##_xmtrx_fvn(emit, reg_no); \
+        sh4asm_bin_##op##_xmtrx_fvn(emit, reg_no); \
     }
 
 OP_XMTRX_FVN(ftrv)
@@ -1436,7 +1436,7 @@ void parser_input_token(struct tok const *tk) {
     }
 }
 
-void parser_set_emitter(emit_bin_handler_func em) {
+void parser_set_emitter(sh4asm_bin_emit_handler_func em) {
     emit = em;
 }
 

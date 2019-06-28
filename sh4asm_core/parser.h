@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2017, snickerbockers <chimerasaurusrex@gmail.com>
+ * Copyright (c) 2017, 2019 snickerbockers <chimerasaurusrex@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -42,6 +42,6 @@ void parser_reset(void);
 
 void parser_input_token(struct tok const *tk);
 
-void parser_set_emitter(emit_bin_handler_func em);
+void parser_set_emitter(sh4asm_bin_emit_handler_func em);
 
 #endif

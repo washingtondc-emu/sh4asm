@@ -35,7 +35,7 @@
 #define PARSER_H_
 
 #include "lexer.h"
-#include "sh4_bin_emit.h"
+#include "sh4asm_bin_emit.h"
 
 // reset the parser to its default state
 void parser_reset(void);

@@ -13,7 +13,6 @@ endif()
 set(sh4asm_core_sources
     "sh4asm_core/sh4_opcodes.h"
     "sh4asm_core/sh4_bin_emit.h"
-    "sh4asm_core/sh4_bin_emit.c"
     "sh4asm_core/sh4asm_txt_emit.h"
     "sh4asm_core/lexer.c"
     "sh4asm_core/lexer.h"

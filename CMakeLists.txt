@@ -15,7 +15,6 @@ set(sh4asm_core_sources
     "sh4asm_core/sh4_bin_emit.h"
     "sh4asm_core/sh4_bin_emit.c"
     "sh4asm_core/sh4_asm_emit.h"
-    "sh4asm_core/sh4_asm_emit.c"
     "sh4asm_core/lexer.c"
     "sh4asm_core/lexer.h"
     "sh4asm_core/parser.c"

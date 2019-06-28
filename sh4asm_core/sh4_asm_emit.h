@@ -38,7 +38,11 @@
 
 typedef void(*sh4asm_txt_emit_handler_func)(char);
 
-void emit_str(sh4asm_txt_emit_handler_func em, char const *txt);
+static void
+sh4asm_txt_emit_str(sh4asm_txt_emit_handler_func em, char const *txt) {
+    while (*txt)
+        em(*txt++);
+}
 
 static char const *sh4asm_gen_reg_str(unsigned idx) {
     static char const* names[16] = {
@@ -130,100 +134,100 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
 // OP
 #define DEF_ASM_NOARG(op, lit)                                          \
     static inline void sh4asm_txt_##op(sh4asm_txt_emit_handler_func em) { \
-        emit_str(em, lit);                                              \
+        sh4asm_txt_emit_str(em, lit);                                              \
     }
 
 // OP Rn
 #define DEF_ASM_RN(op, lit)                                             \
     static inline void sh4asm_txt_##op##_rn(sh4asm_txt_emit_handler_func em, \
                                             unsigned rn) {              \
-        emit_str(em, lit);                                              \
-        emit_str(em, " ");                                              \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit);                                              \
+        sh4asm_txt_emit_str(em, " ");                                              \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP Rm, REG
 #define DEF_ASM_RM_REG(op, lit, reg)                                    \
     static inline void sh4asm_txt_##op##_rm_##reg(sh4asm_txt_emit_handler_func em, \
                                                   unsigned rm) {        \
-        emit_str(em, lit" ");                                           \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, ", " #reg);                                        \
+        sh4asm_txt_emit_str(em, lit" ");                                           \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, ", " #reg);                                        \
     }
 
 // OP REG, Rn
 #define DEF_ASM_REG_RN(op, lit, reg)                                    \
     static inline void sh4asm_txt_##op##_##reg##_rn(sh4asm_txt_emit_handler_func em, \
                                                     unsigned rm) {      \
-        emit_str(em, lit" " #reg ", ");                                 \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, lit" " #reg ", ");                                 \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
     }
 
 // OP @Rn
 #define DEF_ASM_ARN(op, lit)                                            \
     static inline void sh4asm_txt_##op##_arn(sh4asm_txt_emit_handler_func em, \
                                              unsigned rn) {             \
-        emit_str(em, lit " @");                                         \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " @");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP @Rm+, REG
 #define DEF_ASM_ARMP_REG(op, lit, reg)                                  \
     static inline void sh4asm_txt_##op##_armp_##reg(sh4asm_txt_emit_handler_func em, \
                                                     unsigned rm) {      \
-        emit_str(em, lit " @");                                         \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, "+, " #reg);                                       \
+        sh4asm_txt_emit_str(em, lit " @");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, "+, " #reg);                                       \
     }
 
 // OP REG, @-Rn
 #define DEF_ASM_REG_AMRN(op, lit, reg)                                  \
     static inline void sh4asm_txt_##op##_##reg##_amrn(sh4asm_txt_emit_handler_func em, \
                                                       unsigned rn) {    \
-        emit_str(em, lit " " #reg ", @-");                              \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " " #reg ", @-");                              \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP REG, @Rn
 #define DEF_ASM_REG_ARN(op, lit, reg)                                   \
     static inline void sh4asm_txt_##op##_##reg##_arn(sh4asm_txt_emit_handler_func em, \
                                                      unsigned rn) {     \
-        emit_str(em, lit " " #reg ", @");                               \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " " #reg ", @");                               \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP FRn
 #define DEF_ASM_FRN(op, lit)                                            \
     static inline void sh4asm_txt_##op##_frn(sh4asm_txt_emit_handler_func em, \
                                              unsigned frn) {            \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_fr_reg_str(frn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frn));                           \
     }
 
 // OP FRm, REG
 #define DEF_ASM_FRM_REG(op, lit, reg)                                   \
     static inline void sh4asm_txt_##op##_frm_##reg(sh4asm_txt_emit_handler_func em, \
                                                    unsigned frm) {      \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_fr_reg_str(frm));                           \
-        emit_str(em, ", " #reg);                                        \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frm));                           \
+        sh4asm_txt_emit_str(em, ", " #reg);                                        \
     }
 
 // OP REG, FRn
 #define DEF_ASM_REG_FRN(op, lit, reg)                                   \
     static inline void sh4asm_txt_##op##_##reg##_frn(sh4asm_txt_emit_handler_func em, \
                                                      unsigned frn) {    \
-        emit_str(em, lit " " #reg ", ");                                \
-        emit_str(em, sh4asm_fr_reg_str(frn));                           \
+        sh4asm_txt_emit_str(em, lit " " #reg ", ");                                \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frn));                           \
     }
 
 // OP #imm8, REG
 #define DEF_ASM_IMM8_REG(op, lit, reg, imm_shift)                       \
     static inline void sh4asm_txt_##op##_imm8_##reg(sh4asm_txt_emit_handler_func em, \
                                                     unsigned imm8) {    \
-        emit_str(em, lit " #");                                         \
-        emit_str(em, sh4asm_imm8_str(imm8, imm_shift));                 \
-        emit_str(em, ", " #reg);                                        \
+        sh4asm_txt_emit_str(em, lit " #");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_imm8_str(imm8, imm_shift));                 \
+        sh4asm_txt_emit_str(em, ", " #reg);                                        \
     }
 
 // OP #imm8, @(REG1, REG2)
@@ -231,9 +235,9 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_imm8_a_##reg1##_##reg2(sh4asm_txt_emit_handler_func em, \
                                              unsigned imm8) {           \
-        emit_str(em, lit " #");                                         \
-        emit_str(em, sh4asm_imm8_str(imm8, imm_shift));                 \
-        emit_str(em, ", @(" #reg1 ", " #reg2 ")");                      \
+        sh4asm_txt_emit_str(em, lit " #");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_imm8_str(imm8, imm_shift));                 \
+        sh4asm_txt_emit_str(em, ", @(" #reg1 ", " #reg2 ")");                      \
     }
 
 // OP REG1, @(disp8, REG2)
@@ -241,9 +245,9 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_##reg1##_a_disp8_##reg2(sh4asm_txt_emit_handler_func em, \
                                               unsigned disp8) {         \
-        emit_str(em, lit " " #reg1 ", @(");                             \
-        emit_str(em, sh4asm_disp8_str(disp8, disp_shift));              \
-        emit_str(em, ", " #reg2 ")");                                   \
+        sh4asm_txt_emit_str(em, lit " " #reg1 ", @(");                             \
+        sh4asm_txt_emit_str(em, sh4asm_disp8_str(disp8, disp_shift));              \
+        sh4asm_txt_emit_str(em, ", " #reg2 ")");                                   \
     }
 
 // OP @(disp8, REG1), REG2
@@ -251,43 +255,43 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_a_disp8_##reg1##_##reg2(sh4asm_txt_emit_handler_func em, \
                                               unsigned disp8) {         \
-        emit_str(em, lit " @(");                                        \
-        emit_str(em, sh4asm_disp8_str(disp8, disp_shift));              \
-        emit_str(em, ", " #reg1 "), " #reg2);                           \
+        sh4asm_txt_emit_str(em, lit " @(");                                        \
+        sh4asm_txt_emit_str(em, sh4asm_disp8_str(disp8, disp_shift));              \
+        sh4asm_txt_emit_str(em, ", " #reg1 "), " #reg2);                           \
     }
 
 // OP disp8
 #define DEF_ASM_DISP8(op, lit, disp_shift)                              \
     static inline void sh4asm_txt_##op##_disp8(sh4asm_txt_emit_handler_func em, \
                                                unsigned disp8) {        \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_disp8_str(disp8, disp_shift));              \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_disp8_str(disp8, disp_shift));              \
     }
 
 // OP #imm8
 #define DEF_ASM_IMM8(op, lit, imm_shift)                                \
     static inline void sh4asm_txt_##op##_imm8(sh4asm_txt_emit_handler_func em, \
                                               unsigned imm8) {          \
-        emit_str(em, lit " #");                                         \
-        emit_str(em, sh4asm_imm8_str(imm8, imm_shift));                 \
+        sh4asm_txt_emit_str(em, lit " #");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_imm8_str(imm8, imm_shift));                 \
     }
 
 // OP offs12
 #define DEF_ASM_OFFS12(op, lit, imm_shift)                              \
     static inline void sh4asm_txt_##op##_offs12(sh4asm_txt_emit_handler_func em, \
                                                 unsigned imm12) {       \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_imm12_str(imm12, imm_shift));               \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_imm12_str(imm12, imm_shift));               \
     }
 
 // OP #imm8, Rn
 #define DEF_ASM_IMM8_RN(op, lit, imm_shift)                             \
     static inline void sh4asm_txt_##op##_imm8_rn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned imm8, unsigned rn) { \
-        emit_str(em, lit " #");                                         \
-        emit_str(em, sh4asm_imm8_str(imm8, imm_shift));                 \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " #");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_imm8_str(imm8, imm_shift));                 \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP @(disp8, REG), Rn
@@ -295,20 +299,20 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_a_disp8_##reg##_rn(sh4asm_txt_emit_handler_func em, \
                                          unsigned disp8, unsigned rn) { \
-        emit_str(em, lit " @(");                                        \
-        emit_str(em, sh4asm_disp8_str(disp8, disp_shift));              \
-        emit_str(em, ", " #reg "), ");                                  \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " @(");                                        \
+        sh4asm_txt_emit_str(em, sh4asm_disp8_str(disp8, disp_shift));              \
+        sh4asm_txt_emit_str(em, ", " #reg "), ");                                  \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP Rm, Rn
 #define DEF_ASM_RM_RN(op, lit)                                          \
     static inline void sh4asm_txt_##op##_rm_rn(sh4asm_txt_emit_handler_func em, \
                                                unsigned rm, unsigned rn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP Rm, Rn_BANK
@@ -316,10 +320,10 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                              \
     sh4asm_txt_##op##_rm_rn_bank(sh4asm_txt_emit_handler_func em,   \
                                  unsigned rm, unsigned rn_bank) {   \
-        emit_str(em, lit " ");                                      \
-        emit_str(em, sh4asm_gen_reg_str(rm));                       \
-        emit_str(em, ", ");                                         \
-        emit_str(em, sh4asm_bank_reg_str(rn_bank));                 \
+        sh4asm_txt_emit_str(em, lit " ");                                      \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                       \
+        sh4asm_txt_emit_str(em, ", ");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_bank_reg_str(rn_bank));                 \
     }
 
 // OP @Rm+, Rn_BANK
@@ -327,10 +331,10 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                              \
     sh4asm_txt_##op##_armp_rn_bank(sh4asm_txt_emit_handler_func em, \
                                    unsigned rm, unsigned rn_bank) { \
-        emit_str(em, lit " @");                                     \
-        emit_str(em, sh4asm_gen_reg_str(rm));                       \
-        emit_str(em, "+, ");                                        \
-        emit_str(em, sh4asm_bank_reg_str(rn_bank));                 \
+        sh4asm_txt_emit_str(em, lit " @");                                     \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                       \
+        sh4asm_txt_emit_str(em, "+, ");                                        \
+        sh4asm_txt_emit_str(em, sh4asm_bank_reg_str(rn_bank));                 \
     }
 
 // OP Rm_BANK, Rn
@@ -338,10 +342,10 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                              \
     sh4asm_txt_##op##_rm_bank_rn(sh4asm_txt_emit_handler_func em,   \
                                  unsigned rm_bank, unsigned rn) {   \
-        emit_str(em, lit " ");                                      \
-        emit_str(em, sh4asm_bank_reg_str(rm_bank));                 \
-        emit_str(em, ", ");                                         \
-        emit_str(em, sh4asm_gen_reg_str(rn));                       \
+        sh4asm_txt_emit_str(em, lit " ");                                      \
+        sh4asm_txt_emit_str(em, sh4asm_bank_reg_str(rm_bank));                 \
+        sh4asm_txt_emit_str(em, ", ");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                       \
     }
 
 // OP Rm_BANK, @-Rn
@@ -349,10 +353,10 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                              \
     sh4asm_txt_##op##_rm_bank_amrn(sh4asm_txt_emit_handler_func em, \
                                    unsigned rm_bank, unsigned rn) { \
-        emit_str(em, lit " ");                                      \
-        emit_str(em, sh4asm_bank_reg_str(rm_bank));                 \
-        emit_str(em, ", @-");                                       \
-        emit_str(em, sh4asm_gen_reg_str(rn));                       \
+        sh4asm_txt_emit_str(em, lit " ");                                      \
+        sh4asm_txt_emit_str(em, sh4asm_bank_reg_str(rm_bank));                 \
+        sh4asm_txt_emit_str(em, ", @-");                                       \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                       \
     }
 
 // OP Rm, @(REG, Rn)
@@ -360,11 +364,11 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_rm_a_##reg##_rn(sh4asm_txt_emit_handler_func em,  \
                                       unsigned rm, unsigned rn) {       \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, ", @(" #reg", ");                                  \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
-        emit_str(em, ")");                                              \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, ", @(" #reg", ");                                  \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, ")");                                              \
     }
 
 // OP @(REG, Rm), Rn
@@ -372,132 +376,132 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_a_##reg##_rm_rn(sh4asm_txt_emit_handler_func em,  \
                                       unsigned rm, unsigned rn) {       \
-        emit_str(em, lit " @(" #reg ", ");                              \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, "), ");                                            \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " @(" #reg ", ");                              \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, "), ");                                            \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP Rm, @Rn
 #define DEF_ASM_RM_ARN(op, lit)                                         \
     static inline void sh4asm_txt_##op##_rm_arn(sh4asm_txt_emit_handler_func em, \
                                                 unsigned rm, unsigned rn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, ", @");                                            \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, ", @");                                            \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP @Rm, Rn
 #define DEF_ASM_ARM_RN(op, lit)                                         \
     static inline void sh4asm_txt_##op##_arm_rn(sh4asm_txt_emit_handler_func em, \
                                                 unsigned rm, unsigned rn) { \
-        emit_str(em, lit " @");                                         \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " @");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP Rm, @-Rn
 #define DEF_ASM_RM_AMRN(op, lit)                                        \
     static inline void sh4asm_txt_##op##_rm_amrn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned rm, unsigned rn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, ", @-");                                           \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, ", @-");                                           \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP @Rm+, Rn
 #define DEF_ASM_ARMP_RN(op, lit)                                        \
     static inline void sh4asm_txt_##op##_armp_rn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned rm, unsigned rn) { \
-        emit_str(em, lit " @");                                         \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, "+, ");                                            \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " @");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, "+, ");                                            \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP @Rm+, @Rn+
 #define DEF_ASM_ARMP_ARNP(op, lit)                                      \
     static inline void sh4asm_txt_##op##_armp_arnp(sh4asm_txt_emit_handler_func em, \
                                                    unsigned rm, unsigned rn) { \
-        emit_str(em, lit " @");                                         \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, "+, @");                                           \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
-        emit_str(em, "+");                                              \
+        sh4asm_txt_emit_str(em, lit " @");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, "+, @");                                           \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, "+");                                              \
     }
 
 // OP FRm, FRn
 #define DEF_ASM_FRM_FRN(op, lit)                                        \
     static inline void sh4asm_txt_##op##_frm_frn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned frm, unsigned frn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_fr_reg_str(frm));                           \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_fr_reg_str(frn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frm));                           \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frn));                           \
     }
 
 // OP @Rm, FRn
 #define DEF_ASM_ARM_FRN(op, lit)                                        \
     static inline void sh4asm_txt_##op##_arm_frn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned rm, unsigned frn) { \
-        emit_str(em, lit " @");                                         \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_fr_reg_str(frn));                           \
+        sh4asm_txt_emit_str(em, lit " @");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frn));                           \
     }
 
 // OP @(REG, Rm), FRn
 #define DEF_ASM_A_REG_RM_FRN(op, lit, reg)                              \
     static inline void sh4asm_txt_##op##_a_##reg##_rm_frn(sh4asm_txt_emit_handler_func em, \
                                                           unsigned rm, unsigned frn) { \
-        emit_str(em, lit " @(" #reg ", ");                              \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, "), ");                                            \
-        emit_str(em, sh4asm_fr_reg_str(frn));                           \
+        sh4asm_txt_emit_str(em, lit " @(" #reg ", ");                              \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, "), ");                                            \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frn));                           \
     }
 
 // OP @Rm+, FRn
 #define DEF_ASM_ARMP_FRN(op, lit)                                       \
     static inline void sh4asm_txt_##op##_armp_frn(sh4asm_txt_emit_handler_func em, \
                                                   unsigned rm, unsigned frn) { \
-        emit_str(em, lit " @");                                         \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, "+, ");                                            \
-        emit_str(em, sh4asm_fr_reg_str(frn));                           \
+        sh4asm_txt_emit_str(em, lit " @");                                         \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, "+, ");                                            \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frn));                           \
     }
 
 // OP FRm, @Rn
 #define DEF_ASM_FRM_ARN(op, lit)                                        \
     static inline void sh4asm_txt_##op##_frm_arn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned frm, unsigned rn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_fr_reg_str(frm));                           \
-        emit_str(em, ", @");                                            \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frm));                           \
+        sh4asm_txt_emit_str(em, ", @");                                            \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP FRm, @-Rn
 #define DEF_ASM_FRM_AMRN(op, lit)                                       \
     static inline void sh4asm_txt_##op##_frm_amrn(sh4asm_txt_emit_handler_func em, \
                                                   unsigned frm, unsigned rn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_fr_reg_str(frm));                           \
-        emit_str(em, ", @-");                                           \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frm));                           \
+        sh4asm_txt_emit_str(em, ", @-");                                           \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP FRm, @(REG, Rn)
 #define DEF_ASM_FRM_A_REG_RN(op, lit, reg)                              \
     static inline void sh4asm_txt_##op##_frm_a_##reg##_rn(sh4asm_txt_emit_handler_func em, \
                                                           unsigned frm, unsigned rn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_fr_reg_str(frm));                           \
-        emit_str(em, ", @(" #reg ", ");                                 \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
-        emit_str(em, ")");                                              \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frm));                           \
+        sh4asm_txt_emit_str(em, ", @(" #reg ", ");                                 \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, ")");                                              \
     }
 
 // OP REG, FRm, Frn
@@ -505,10 +509,10 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_##reg##_frm_frn(sh4asm_txt_emit_handler_func em,  \
                                       unsigned frm, unsigned frn) {     \
-        emit_str(em, lit " " #reg ", ");                                \
-        emit_str(em, sh4asm_fr_reg_str(frm));                           \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_fr_reg_str(frn));                           \
+        sh4asm_txt_emit_str(em, lit " " #reg ", ");                                \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frm));                           \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_fr_reg_str(frn));                           \
     }
 
 // OP REG, @(disp4, Rn)
@@ -516,11 +520,11 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_##reg##_a_disp4_rn(sh4asm_txt_emit_handler_func em, \
                                          unsigned disp4, unsigned rn) { \
-        emit_str(em, lit " " #reg ", @(");                              \
-        emit_str(em, sh4asm_disp4_str(disp4, disp_shift));              \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
-        emit_str(em, ")");                                              \
+        sh4asm_txt_emit_str(em, lit " " #reg ", @(");                              \
+        sh4asm_txt_emit_str(em, sh4asm_disp4_str(disp4, disp_shift));              \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, ")");                                              \
     }
 
 // OP @(disp4, Rm), REG
@@ -528,11 +532,11 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_a_disp4_rm_##reg(sh4asm_txt_emit_handler_func em, \
                                        unsigned disp4, unsigned rm) {   \
-        emit_str(em, lit " @(");                                        \
-        emit_str(em, sh4asm_disp4_str(disp4, disp_shift));              \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, "), " #reg);                                       \
+        sh4asm_txt_emit_str(em, lit " @(");                                        \
+        sh4asm_txt_emit_str(em, sh4asm_disp4_str(disp4, disp_shift));              \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, "), " #reg);                                       \
     }
 
 // OP rm, @(disp4, rn)
@@ -540,13 +544,13 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_rm_a_disp4_rn(sh4asm_txt_emit_handler_func em,    \
                                     unsigned rm, unsigned disp4, unsigned rn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, ", @(");                                           \
-        emit_str(em, sh4asm_disp4_str(disp4, disp_shift));              \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
-        emit_str(em, ")");                                              \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, ", @(");                                           \
+        sh4asm_txt_emit_str(em, sh4asm_disp4_str(disp4, disp_shift));              \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, ")");                                              \
     }
 
 // OP @(disp4, rm), rn
@@ -554,72 +558,72 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_a_disp4_rm_rn(sh4asm_txt_emit_handler_func em,    \
                                     unsigned disp4, unsigned rm, unsigned rn) { \
-        emit_str(em, lit " @(");                                        \
-        emit_str(em, sh4asm_disp4_str(disp4, disp_shift));              \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_gen_reg_str(rm));                           \
-        emit_str(em, "), ");                                            \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " @(");                                        \
+        sh4asm_txt_emit_str(em, sh4asm_disp4_str(disp4, disp_shift));              \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rm));                           \
+        sh4asm_txt_emit_str(em, "), ");                                            \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP DRm, DRn
 #define DEF_ASM_DRM_DRN(op, lit)                                        \
     static inline void sh4asm_txt_##op##_drm_drn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned drm, unsigned drn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_dr_reg_str(drm));                           \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_dr_reg_str(drn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_dr_reg_str(drm));                           \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_dr_reg_str(drn));                           \
     }
 
 // OP DRm, XDn
 #define DEF_ASM_DRM_XDN(op, lit)                                        \
     static inline void sh4asm_txt_##op##_drm_xdn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned drm, unsigned xdn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_dr_reg_str(drm));                           \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_xd_reg_str(xdn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_dr_reg_str(drm));                           \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_xd_reg_str(xdn));                           \
     }
 
 // OP XDm, DRn
 #define DEF_ASM_XDM_DRN(op, lit)                                        \
     static inline void sh4asm_txt_##op##_xdm_drn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned xdm, unsigned drn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_xd_reg_str(xdm));                           \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_dr_reg_str(drn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_xd_reg_str(xdm));                           \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_dr_reg_str(drn));                           \
     }
 
 // OP XDm, XDn
 #define DEF_ASM_XDM_XDN(op, lit)                                        \
     static inline void sh4asm_txt_##op##_xdm_xdn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned xdm, unsigned xdn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_xd_reg_str(xdm));                           \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_xd_reg_str(xdn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_xd_reg_str(xdm));                           \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_xd_reg_str(xdn));                           \
     }
 
 // OP DRm, @Rn
 #define DEF_ASM_DRM_ARN(op, lit)                                        \
     static inline void sh4asm_txt_##op##_drm_arn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned drm, unsigned rn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_dr_reg_str(drm));                           \
-        emit_str(em, ", @");                                            \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_dr_reg_str(drm));                           \
+        sh4asm_txt_emit_str(em, ", @");                                            \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP DRm, @-Rn
 #define DEF_ASM_DRM_AMRN(op, lit)                                       \
     static inline void sh4asm_txt_##op##_drm_amrn(sh4asm_txt_emit_handler_func em, \
                                                   unsigned drm, unsigned rn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_dr_reg_str(drm));                           \
-        emit_str(em, ", @-");                                           \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_dr_reg_str(drm));                           \
+        sh4asm_txt_emit_str(em, ", @-");                                           \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP DRm, @(REG, Rn)
@@ -627,31 +631,31 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_drm_a_##reg##_rn(sh4asm_txt_emit_handler_func em, \
                                        unsigned drm, unsigned rn) {     \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_dr_reg_str(drm));                           \
-        emit_str(em, ", @(" #reg ", ");                                 \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
-        emit_str(em, ")");                                              \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_dr_reg_str(drm));                           \
+        sh4asm_txt_emit_str(em, ", @(" #reg ", ");                                 \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, ")");                                              \
     }
 
 // OP Xdm, @Rn
 #define DEF_ASM_XDM_ARN(op, lit)                                        \
     static inline void sh4asm_txt_##op##_xdm_arn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned xdm, unsigned rn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_xd_reg_str(xdm));                           \
-        emit_str(em, ", @");                                            \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_xd_reg_str(xdm));                           \
+        sh4asm_txt_emit_str(em, ", @");                                            \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP Xdm, @-Rn
 #define DEF_ASM_XDM_AMRN(op, lit)                                       \
     static inline void sh4asm_txt_##op##_xdm_amrn(sh4asm_txt_emit_handler_func em, \
                                                   unsigned xdm, unsigned rn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_xd_reg_str(xdm));                           \
-        emit_str(em, ", @-");                                           \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_xd_reg_str(xdm));                           \
+        sh4asm_txt_emit_str(em, ", @-");                                           \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
 // OP Xdm, @(REG, Rn)
@@ -659,46 +663,46 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                                  \
     sh4asm_txt_##op##_xdm_a_##reg##_rn(sh4asm_txt_emit_handler_func em, \
                                        unsigned xdm, unsigned rn) {     \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_xd_reg_str(xdm));                           \
-        emit_str(em, ", @(" #reg ", ");                                 \
-        emit_str(em, sh4asm_gen_reg_str(rn));                           \
-        emit_str(em, ")");                                              \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_xd_reg_str(xdm));                           \
+        sh4asm_txt_emit_str(em, ", @(" #reg ", ");                                 \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
+        sh4asm_txt_emit_str(em, ")");                                              \
     }
 
 // OP DRn
 #define DEF_ASM_DRN(op, lit)                                            \
     static inline void sh4asm_txt_##op##_drn(sh4asm_txt_emit_handler_func em, \
                                              unsigned drn) {            \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_dr_reg_str(drn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_dr_reg_str(drn));                           \
     }
 
 // OP DRm, REG
 #define DEF_ASM_DRM_REG(op, lit, reg)                                   \
     static inline void sh4asm_txt_##op##_drm_##reg(sh4asm_txt_emit_handler_func em, \
                                                    unsigned drm) {      \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_dr_reg_str(drm));                           \
-        emit_str(em, ", " #reg);                                        \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_dr_reg_str(drm));                           \
+        sh4asm_txt_emit_str(em, ", " #reg);                                        \
     }
 
 // OP REG, DRn
 #define DEF_ASM_REG_DRN(op, lit, reg)                                   \
     static inline void sh4asm_txt_##op##_##reg##_drn(sh4asm_txt_emit_handler_func em, \
                                                      unsigned drn) {    \
-        emit_str(em, lit " " #reg ", ");                                \
-        emit_str(em, sh4asm_dr_reg_str(drn));                           \
+        sh4asm_txt_emit_str(em, lit " " #reg ", ");                                \
+        sh4asm_txt_emit_str(em, sh4asm_dr_reg_str(drn));                           \
     }
 
 // OP FVm, FVn
 #define DEF_ASM_FVM_FVN(op, lit)                                        \
     static inline void sh4asm_txt_##op##_fvm_fvn(sh4asm_txt_emit_handler_func em, \
                                                  unsigned fvm, unsigned fvn) { \
-        emit_str(em, lit " ");                                          \
-        emit_str(em, sh4asm_fv_reg_str(fvm));                           \
-        emit_str(em, ", ");                                             \
-        emit_str(em, sh4asm_fv_reg_str(fvn));                           \
+        sh4asm_txt_emit_str(em, lit " ");                                          \
+        sh4asm_txt_emit_str(em, sh4asm_fv_reg_str(fvm));                           \
+        sh4asm_txt_emit_str(em, ", ");                                             \
+        sh4asm_txt_emit_str(em, sh4asm_fv_reg_str(fvn));                           \
     }
 
 // OP REG, FVn
@@ -706,8 +710,8 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     static inline void                                              \
     sh4asm_txt_##op##_##reg##_fvn(sh4asm_txt_emit_handler_func em,  \
                                   unsigned fvn) {                   \
-        emit_str(em, lit " " #reg ", ");                            \
-        emit_str(em, sh4asm_fv_reg_str(fvn));                       \
+        sh4asm_txt_emit_str(em, lit " " #reg ", ");                            \
+        sh4asm_txt_emit_str(em, sh4asm_fv_reg_str(fvn));                       \
     }
 
 DEF_ASM_NOARG(div0u, "div0u")

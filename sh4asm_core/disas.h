@@ -35,6 +35,7 @@
 #define SH4ASM_DISAS_H_
 
 #include <stdint.h>
+#include <string.h>
 
 #include "sh4asm_txt_emit.h"
 

@@ -42,8 +42,6 @@
 #include <stdarg.h>
 
 #include "sh4asm.h"
-#include "lexer.h"
-#include "parser.h"
 #include "disas.h"
 
 static FILE *output;
@@ -89,12 +87,12 @@ static void do_emit_bin(uint16_t inst) {
 static void do_asm(void) {
     int ch;
 
-    parser_set_emitter(do_emit_bin);
+    sh4asm_set_emitter(do_emit_bin);
 
     while ((ch = fgetc(input)) != EOF) {
         if (options.case_insensitive)
             ch = tolower(ch);
-        lexer_input_char(ch, parser_input_token);
+        sh4asm_input_char(ch);
     }
 }
 

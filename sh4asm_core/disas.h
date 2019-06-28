@@ -36,7 +36,7 @@
 
 #include <stdint.h>
 
-#include "sh4_asm_emit.h"
+#include "sh4asm_txt_emit.h"
 
 #ifdef __cplusplus
 extern "C" {

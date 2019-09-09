@@ -43,6 +43,8 @@
 extern "C" {
 #endif
 
+#define SH4ASM_STATIC static inline
+
 /*******************************************************************************
  *
  * BEGIN PUBLIC API
@@ -52,7 +54,7 @@ extern "C" {
 // this must match the asm_emit_handler_func typedef in sh4_asm_emit.h
 typedef void(*sh4asm_disas_emit_func)(char);
 
-static void sh4asm_disas_inst(uint16_t inst, sh4asm_disas_emit_func em);
+SH4ASM_STATIC void sh4asm_disas_inst(uint16_t inst, sh4asm_disas_emit_func em);
 
 /*******************************************************************************
  *
@@ -60,7 +62,8 @@ static void sh4asm_disas_inst(uint16_t inst, sh4asm_disas_emit_func em);
  *
  ******************************************************************************/
 
-static void sh4asm_opcode_non_inst_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_opcode_non_inst_(unsigned const *quads, sh4asm_disas_emit_func em) {
 #define NON_INST_BUF_LEN 64
     char buf[NON_INST_BUF_LEN];
     memset(buf, 0, sizeof(buf));
@@ -73,7 +76,8 @@ static void sh4asm_opcode_non_inst_(unsigned const *quads, sh4asm_disas_emit_fun
         em(*outp++);
 }
 
-static void sh4asm_disas_0xx2_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_0xx2_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_stc_sr_rn(em, quads[2]);
@@ -106,7 +110,8 @@ static void sh4asm_disas_0xx2_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_0xx3_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_0xx3_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf0ff
     switch (quads[1]) {
     case 0:
@@ -135,27 +140,32 @@ static void sh4asm_disas_0xx3_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_0xx4_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_0xx4_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf00f
     sh4asm_txt_movb_rm_a_r0_rn(em, quads[1], quads[2]);
 }
 
-static void sh4asm_disas_0xx5_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_0xx5_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf00f
     sh4asm_txt_movw_rm_a_r0_rn(em, quads[1], quads[2]);
 }
 
-static void sh4asm_disas_0xx6_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_0xx6_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf00f
     sh4asm_txt_movl_rm_a_r0_rn(em, quads[1], quads[2]);
 }
 
-static void sh4asm_disas_0xx7_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_0xx7_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf00f
     sh4asm_txt_mull_rm_rn(em, quads[1], quads[2]);
 }
 
-static void sh4asm_disas_0xx8_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_0xx8_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xffff
     if (quads[2] != 0) {
         sh4asm_opcode_non_inst_(quads, em);
@@ -186,7 +196,8 @@ static void sh4asm_disas_0xx8_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_0xx9_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_0xx9_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         // mask is 0xffff
@@ -214,7 +225,8 @@ static void sh4asm_disas_0xx9_(unsigned const *quads, sh4asm_disas_emit_func em)
     sh4asm_opcode_non_inst_(quads, em);
 }
 
-static void sh4asm_disas_0xxa_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_0xxa_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf0ff
     switch (quads[1]) {
     case 0:
@@ -243,7 +255,8 @@ static void sh4asm_disas_0xxa_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_0xxb_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_0xxb_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xffff
     if (quads[2])
         goto non_inst;
@@ -265,12 +278,14 @@ static void sh4asm_disas_0xxb_(unsigned const *quads, sh4asm_disas_emit_func em)
     sh4asm_opcode_non_inst_(quads, em);
 }
 
-static void sh4asm_disas_0xxc_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_0xxc_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf00f
     sh4asm_txt_movb_a_r0_rm_rn(em, quads[1], quads[2]);
 }
 
-static void sh4asm_disas_0xxd_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_0xxd_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf00f
     sh4asm_txt_movw_a_r0_rm_rn(em, quads[1], quads[2]);
 }
@@ -334,7 +349,8 @@ static void sh4asm_disas_0xxx_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_1xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_1xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf000
     unsigned rn = quads[2];
     unsigned rm = quads[1];
@@ -343,7 +359,8 @@ static void sh4asm_disas_1xxx_(unsigned const *quads, sh4asm_disas_emit_func em)
     sh4asm_txt_movl_rm_a_disp4_rn(em, rm, disp << 2, rn);
 }
 
-static void sh4asm_disas_2xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_2xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf00f
     unsigned rm = quads[1];
     unsigned rn = quads[2];
@@ -398,7 +415,8 @@ static void sh4asm_disas_2xxx_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_3xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_3xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf00f
     unsigned rm = quads[1];
     unsigned rn = quads[2];
@@ -450,7 +468,8 @@ static void sh4asm_disas_3xxx_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xx3_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xx3_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_stcl_sr_amrn(em, quads[2]);
@@ -482,7 +501,8 @@ static void sh4asm_disas_4xx3_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xxe_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xxe_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_ldc_rm_sr(em, quads[2]);
@@ -514,7 +534,8 @@ static void sh4asm_disas_4xxe_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xx7_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xx7_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_ldcl_armp_sr(em, quads[2]);
@@ -546,7 +567,8 @@ static void sh4asm_disas_4xx7_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xx0_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xx0_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_shll_rn(em, quads[2]);
@@ -562,7 +584,8 @@ static void sh4asm_disas_4xx0_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xx1_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xx1_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_shlr_rn(em, quads[2]);
@@ -578,7 +601,8 @@ static void sh4asm_disas_4xx1_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xx2_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xx2_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_stsl_mach_amrn(em, quads[2]);
@@ -606,7 +630,8 @@ static void sh4asm_disas_4xx2_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xx4_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xx4_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_rotl_rn(em, quads[2]);
@@ -619,7 +644,8 @@ static void sh4asm_disas_4xx4_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xx5_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xx5_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_rotr_rn(em, quads[2]);
@@ -635,7 +661,8 @@ static void sh4asm_disas_4xx5_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xx6_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xx6_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_ldsl_armp_mach(em, quads[2]);
@@ -660,7 +687,8 @@ static void sh4asm_disas_4xx6_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xx8_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xx8_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_shll2_rn(em, quads[2]);
@@ -676,7 +704,8 @@ static void sh4asm_disas_4xx8_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xx9_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xx9_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_shlr2_rn(em, quads[2]);
@@ -692,7 +721,8 @@ static void sh4asm_disas_4xx9_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xxa_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xxa_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_lds_rm_mach(em, quads[2]);
@@ -717,7 +747,8 @@ static void sh4asm_disas_4xxa_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xxb_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xxb_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_jsr_arn(em, quads[2]);
@@ -733,7 +764,8 @@ static void sh4asm_disas_4xxb_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_4xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_4xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[0]) {
     case 0:
         sh4asm_disas_4xx0_(quads, em);
@@ -788,12 +820,14 @@ static void sh4asm_disas_4xxx_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_5xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_5xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf000
     sh4asm_txt_movl_a_disp4_rm_rn(em, quads[0] << 2, quads[1], quads[2]);
 }
 
-static void sh4asm_disas_6xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_6xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     unsigned rm = quads[1];
     unsigned rn = quads[2];
     switch (quads[0]) {
@@ -850,12 +884,14 @@ static void sh4asm_disas_6xxx_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_7xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_7xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf000
     sh4asm_txt_add_imm8_rn(em, (quads[1] << 4) | (quads[0]), quads[2]);
 }
 
-static void sh4asm_disas_8xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_8xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xff00
     switch (quads[2]) {
     case 0:
@@ -890,14 +926,16 @@ static void sh4asm_disas_8xxx_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_9xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_9xxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf000
     unsigned disp = (quads[1] << 4) | quads[0];
     unsigned reg_no = quads[2];
     sh4asm_txt_movw_a_disp8_pc_rn(em, 2 * disp + 4, reg_no);
 }
 
-static void sh4asm_disas_axxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_axxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask ix 0xf000
     unsigned imm_val = (quads[2] << 8) | (quads[1] << 4) | quads[0];
     unsigned offs = 2 * imm_val + 4;
@@ -905,14 +943,16 @@ static void sh4asm_disas_axxx_(unsigned const *quads, sh4asm_disas_emit_func em)
     sh4asm_txt_bra_offs12(em, offs);
 }
 
-static void sh4asm_disas_bxxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_bxxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask ix 0xf000
     unsigned imm_val = (quads[2] << 8) | (quads[1] << 4) | quads[0];
     unsigned offs = 2 * imm_val + 4;
     sh4asm_txt_bsr_offs12(em, offs);
 }
 
-static void sh4asm_disas_cxxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_cxxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xff00
     unsigned imm_val = (quads[1] << 4) | quads[0];
     switch (quads[2]) {
@@ -969,21 +1009,24 @@ static void sh4asm_disas_cxxx_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_dxxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_dxxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf000
     unsigned disp = (quads[1] << 4) | quads[0];
     unsigned reg_no = quads[2];
     sh4asm_txt_movl_a_disp8_pc_rn(em, 4 * disp + 4, reg_no);
 }
 
-static void sh4asm_disas_exxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_exxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     // mask is 0xf000
     unsigned imm_val = (quads[1] << 4) | quads[0];
     unsigned reg_no = quads[2];
     sh4asm_txt_mov_imm8_rn(em, imm_val, reg_no);
 }
 
-static void sh4asm_disas_fxfd_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_fxfd_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[2]) {
     case 1:
     case 5:
@@ -1012,7 +1055,8 @@ static void sh4asm_disas_fxfd_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_fxxd_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_fxxd_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[1]) {
     case 0:
         sh4asm_txt_fsts_fpul_frn(em, quads[2]);
@@ -1069,7 +1113,8 @@ static void sh4asm_disas_fxxd_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_fxxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_fxxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
     switch (quads[0]) {
     case 0:
         // mask is f00f
@@ -1148,7 +1193,8 @@ static void sh4asm_disas_fxxx_(unsigned const *quads, sh4asm_disas_emit_func em)
     }
 }
 
-static void sh4asm_disas_inst(uint16_t inst, sh4asm_disas_emit_func em) {
+SH4ASM_STATIC void
+sh4asm_disas_inst(uint16_t inst, sh4asm_disas_emit_func em) {
     unsigned const quads[4] = {
         inst & 0xf,
         (inst & 0x00f0) >> 4,

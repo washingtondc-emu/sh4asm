@@ -1196,10 +1196,10 @@ sh4asm_disas_fxxx_(unsigned const *quads, sh4asm_disas_emit_func em) {
 SH4ASM_STATIC void
 sh4asm_disas_inst(uint16_t inst, sh4asm_disas_emit_func em) {
     unsigned const quads[4] = {
-        inst & 0xf,
-        (inst & 0x00f0) >> 4,
-        (inst & 0x0f00) >> 8,
-        (inst & 0xf000) >> 12
+        inst & 0xfu,
+        (inst & 0x00f0u) >> 4,
+        (inst & 0x0f00u) >> 8,
+        (inst & 0xf000u) >> 12
     };
     switch (quads[3]) {
     case 0:

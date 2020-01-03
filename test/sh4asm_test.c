@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2016, 2017, 2019 snickerbockers <chimerasaurusrex@gmail.com>
+ * Copyright (c) 2016,2017,2019,2020 snickerbockers <chimerasaurusrex@gmail.com>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -98,7 +98,7 @@ bool test_inst(char const *inst) {
              "with the test)");
     }
 
-    printf("about to test \"%s\"\n", inst);
+    printf("about to test %s", inst);
 
     // first assemble the instruction
     clear_bin();
@@ -114,13 +114,16 @@ bool test_inst(char const *inst) {
 
     // now disassemble it
     clear_asm();
-    sh4asm_disas_inst(inst_bin, neo_asm_emit);
+    sh4asm_disas_inst(inst_bin, neo_asm_emit, 0);
 
     // add in a newline
     neo_asm_emit('\n');
     neo_asm_emit('\0');
 
     char const *new_inst = sh4asm_disas;
+
+    printf("The returned instruction was %s", new_inst);
+
     // now reassemble the instruction
     clear_bin();
     sh4asm_set_emitter(neo_bin_emit);
@@ -513,12 +516,20 @@ static void process_inst_str(char *inst_out, unsigned max_len,
     inst_out[out_idx] = '\0';
 }
 
+__attribute__((__noreturn__)) static void
+error_handler(char const *fmt, va_list args) {
+    vfprintf(stderr, fmt, args);
+    abort();
+}
+
 // this returns 0 on success, nonzero on failure
 int test_all_insts(unsigned seed) {
     unsigned n_tests = 0;
     unsigned n_success = 0;
     char const **inst = insts_to_test;
     char processed[64];
+
+    sh4asm_set_error_handler(error_handler);
 
     srand(seed);
     while (*inst) {

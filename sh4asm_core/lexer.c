@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2017, 2019 snickerbockers <chimerasaurusrex@gmail.com>
+ * Copyright (c) 2017, 2019, 2020 snickerbockers <snickerbockers@washemu.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -201,6 +201,7 @@ static struct sh4asm_tok_mapping {
 #define SH4ASM_TOK_LEN_MAX 32
 static char cur_tok[SH4ASM_TOK_LEN_MAX];
 static unsigned tok_len;
+static bool in_comment;
 
 static struct sh4asm_tok_mapping const* check_tok(void) {
     struct sh4asm_tok_mapping const *curs = tok_map;
@@ -218,6 +219,16 @@ static struct sh4asm_tok_mapping const* check_tok(void) {
 void sh4asm_lexer_input_char(char ch, sh4asm_tok_emit_func emit) {
     if (tok_len >= (SH4ASM_TOK_LEN_MAX - 1))
         sh4asm_error("Token is too long");
+
+    if (in_comment) {
+        if (ch == '\n')
+            in_comment = false;
+        else
+            ch = ' ';
+    } else if (ch == '!') {
+        in_comment = true;
+        ch = ' ';
+    }
 
     if (isspace(ch) || ch == ',' || ch == '@' || ch == '(' || ch == ')' ||
         ch == '\0' || ch == '\n' || ch == '+' || ch == '-') {

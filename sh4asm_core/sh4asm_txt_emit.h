@@ -1,6 +1,6 @@
 /*******************************************************************************
  *
- * Copyright (c) 2017, 2019 snickerbockers <chimerasaurusrex@gmail.com>
+ * Copyright (c) 2017, 2019, 2020 snickerbockers <snickerbockers@washemu.org>
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -35,6 +35,7 @@
 #define SH4ASM_TXT_EMIT_H_
 
 #include <stdio.h>
+#include <stdint.h>
 
 typedef void(*sh4asm_txt_emit_handler_func)(char);
 
@@ -104,12 +105,24 @@ static char const *sh4asm_imm8_str(unsigned imm8, unsigned shift) {
     return buf;
 }
 
-static char const *sh4asm_imm12_str(unsigned imm12, unsigned shift) {
-    // TODO: pad output to three digits
-    static char buf[8];
-    snprintf(buf, sizeof(buf), "0x%x", //"0x%03x",
-             imm12 & ((4096 << shift) - 1) & ~((1 << shift) - 1));
-    buf[7] = '\0';
+static char const *sh4asm_imm12_str(int imm12, uint32_t pc) {
+    static char buf[32];
+    snprintf(buf, sizeof(buf), "0x%08x", (int)(pc + imm12));
+    buf[31] = '\0';
+    return buf;
+}
+
+static char const *sh4asm_disp8_pc_str(int disp8, uint32_t pc) {
+    static char buf[32];
+    snprintf(buf, sizeof(buf), "0x%08x", disp8);
+    buf[31] = '\0';
+    return buf;
+}
+
+static char const *sh4asm_disp8_pc_comment(int disp8, uint32_t pc) {
+    static char buf[32];
+    snprintf(buf, sizeof(buf), " ! 0x%08x", (int)(pc + disp8));
+    buf[31] = '\0';
     return buf;
 }
 
@@ -260,12 +273,25 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
         sh4asm_txt_emit_str(em, ", " #reg1 "), " #reg2);                           \
     }
 
+// OP @(disp8, PC), REG2
+#define SH4ASM_DEF_TXT_A_DISP8_PC_REG2(op, lit, reg2)                   \
+    static inline void                                                  \
+    sh4asm_txt_##op##_a_disp8_pc_##reg2(sh4asm_txt_emit_handler_func em, \
+                                        int disp8, uint32_t pc) {       \
+        sh4asm_txt_emit_str(em, lit " @(");                             \
+        sh4asm_txt_emit_str(em, sh4asm_disp8_pc_str(disp8, pc));        \
+        sh4asm_txt_emit_str(em, ", pc), " #reg2);                       \
+        sh4asm_txt_emit_str(em, sh4asm_disp8_pc_comment(disp8, pc));    \
+    }
+
 // OP disp8
-#define SH4ASM_DEF_TXT_DISP8(op, lit, disp_shift)                              \
-    static inline void sh4asm_txt_##op##_disp8(sh4asm_txt_emit_handler_func em, \
-                                               unsigned disp8) {        \
-        sh4asm_txt_emit_str(em, lit " ");                                          \
-        sh4asm_txt_emit_str(em, sh4asm_disp8_str(disp8, disp_shift));              \
+#define SH4ASM_DEF_TXT_DISP8_PC(op, lit, disp_shift)                    \
+    static inline void                                                  \
+    sh4asm_txt_##op##_disp8_pc(sh4asm_txt_emit_handler_func em,         \
+                               int disp8, uint32_t pc) {                \
+        sh4asm_txt_emit_str(em, lit " ");                               \
+        sh4asm_txt_emit_str(em, sh4asm_disp8_pc_str(disp8, pc));        \
+        sh4asm_txt_emit_str(em, sh4asm_disp8_pc_comment(disp8, pc));    \
     }
 
 // OP #imm8
@@ -277,11 +303,12 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
     }
 
 // OP offs12
-#define SH4ASM_DEF_TXT_OFFS12(op, lit, imm_shift)                              \
-    static inline void sh4asm_txt_##op##_offs12(sh4asm_txt_emit_handler_func em, \
-                                                unsigned imm12) {       \
-        sh4asm_txt_emit_str(em, lit " ");                                          \
-        sh4asm_txt_emit_str(em, sh4asm_imm12_str(imm12, imm_shift));               \
+#define SH4ASM_DEF_TXT_OFFS12(op, lit)                                  \
+    static inline void                                                  \
+    sh4asm_txt_##op##_offs12(sh4asm_txt_emit_handler_func em,           \
+                             int imm12, uint32_t pc) {                  \
+        sh4asm_txt_emit_str(em, lit " ");                               \
+        sh4asm_txt_emit_str(em, sh4asm_imm12_str(imm12, pc));           \
     }
 
 // OP #imm8, Rn
@@ -294,15 +321,16 @@ static char const *sh4asm_disp8_str(unsigned disp8, unsigned shift) {
         sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
     }
 
-// OP @(disp8, REG), Rn
-#define SH4ASM_DEF_TXT_A_DISP8_REG_RN(op, lit, reg, disp_shift)                \
+// OP @(disp8, PC), Rn
+#define SH4ASM_DEF_TXT_A_DISP8_PC_RN(op, lit)                           \
     static inline void                                                  \
-    sh4asm_txt_##op##_a_disp8_##reg##_rn(sh4asm_txt_emit_handler_func em, \
-                                         unsigned disp8, unsigned rn) { \
-        sh4asm_txt_emit_str(em, lit " @(");                                        \
-        sh4asm_txt_emit_str(em, sh4asm_disp8_str(disp8, disp_shift));              \
-        sh4asm_txt_emit_str(em, ", " #reg "), ");                                  \
-        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                           \
+    sh4asm_txt_##op##_a_disp8_pc_rn(sh4asm_txt_emit_handler_func em,    \
+                                    int disp8, unsigned pc, unsigned rn) { \
+        sh4asm_txt_emit_str(em, lit " @(");                             \
+        sh4asm_txt_emit_str(em, sh4asm_disp8_pc_str(disp8, pc));        \
+        sh4asm_txt_emit_str(em, ", pc), ");                             \
+        sh4asm_txt_emit_str(em, sh4asm_gen_reg_str(rn));                \
+        sh4asm_txt_emit_str(em, sh4asm_disp8_pc_comment(disp8, pc));    \
     }
 
 // OP Rm, Rn
@@ -833,10 +861,10 @@ SH4ASM_DEF_TXT_IMM8_A_REG_REG(orb, "or.b", r0, gbr, 0)
 SH4ASM_DEF_TXT_IMM8_A_REG_REG(tstb, "tst.b", r0, gbr, 0)
 SH4ASM_DEF_TXT_IMM8_A_REG_REG(xorb, "xor.b", r0, gbr, 0)
 
-SH4ASM_DEF_TXT_DISP8(bf, "bf", 1)
-SH4ASM_DEF_TXT_DISP8(bfs, "bf/s", 1)
-SH4ASM_DEF_TXT_DISP8(bt, "bt", 1)
-SH4ASM_DEF_TXT_DISP8(bts, "bt/s", 1)
+SH4ASM_DEF_TXT_DISP8_PC(bf, "bf", 1)
+SH4ASM_DEF_TXT_DISP8_PC(bfs, "bf/s", 1)
+SH4ASM_DEF_TXT_DISP8_PC(bt, "bt", 1)
+SH4ASM_DEF_TXT_DISP8_PC(bts, "bt/s", 1)
 
 SH4ASM_DEF_TXT_IMM8(trapa, "trapa", 0)
 
@@ -847,16 +875,16 @@ SH4ASM_DEF_TXT_REG_A_DISP8_REG(movl, "mov.l", r0, gbr, 2)
 SH4ASM_DEF_TXT_A_DISP8_REG1_REG2(movb, "mov.b", gbr, r0, 0)
 SH4ASM_DEF_TXT_A_DISP8_REG1_REG2(movw, "mov.w", gbr, r0, 1)
 SH4ASM_DEF_TXT_A_DISP8_REG1_REG2(movl, "mov.l", gbr, r0, 2)
-SH4ASM_DEF_TXT_A_DISP8_REG1_REG2(mova, "mova", pc, r0, 2)
+SH4ASM_DEF_TXT_A_DISP8_PC_REG2(mova, "mova", r0)
 
-SH4ASM_DEF_TXT_OFFS12(bra, "bra", 1)
-SH4ASM_DEF_TXT_OFFS12(bsr, "bsr", 1)
+SH4ASM_DEF_TXT_OFFS12(bra, "bra")
+SH4ASM_DEF_TXT_OFFS12(bsr, "bsr")
 
 SH4ASM_DEF_TXT_IMM8_RN(mov, "mov", 0)
 SH4ASM_DEF_TXT_IMM8_RN(add, "add", 0)
 
-SH4ASM_DEF_TXT_A_DISP8_REG_RN(movw, "mov.w", pc, 1)
-SH4ASM_DEF_TXT_A_DISP8_REG_RN(movl, "mov.l", pc, 2)
+SH4ASM_DEF_TXT_A_DISP8_PC_RN(movw, "mov.w")
+SH4ASM_DEF_TXT_A_DISP8_PC_RN(movl, "mov.l")
 
 SH4ASM_DEF_TXT_RM_RN(mov, "mov")
 SH4ASM_DEF_TXT_RM_RN(swapb, "swap.b")

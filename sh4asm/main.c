@@ -40,6 +40,7 @@
 #include <stdint.h>
 #include <getopt.h>
 #include <stdarg.h>
+#include <stdlib.h>
 
 #include "sh4asm.h"
 #include "disas.h"
@@ -100,8 +101,8 @@ static void do_emit_asm(char ch) {
     fputc(ch, output);
 }
 
-static void do_disasm(void) {
-    unsigned pc = 0;
+static void do_disasm(unsigned first_pc) {
+    unsigned pc = first_pc;
 
     if (options.bin_mode) {
         uint16_t dat;
@@ -158,6 +159,36 @@ static void do_disasm(void) {
     }
 }
 
+static unsigned do_parse_int(char const *in) {
+    if (in[0] == '0' && (in[1] == 'x' || in[1] == 'X')) {
+        // hex
+        in += 2;
+        unsigned ret = 0;
+        char const *cur = in;
+        while (*cur)
+            cur++;
+        unsigned place = 1;
+        while (cur != in) {
+            cur--;
+            unsigned digit;
+            if (*cur >= '0' && *cur <= '9')
+                digit = *cur - '0';
+            else if (*cur >= 'a' && *cur <= 'f')
+                digit = *cur - 'a' + 10;
+            else if (*cur >= 'A' && *cur <= 'F')
+                digit = *cur - 'A' + 10;
+            else
+                return 0;
+            ret += digit * place;
+            place *= 16;
+        }
+        return ret;
+    } else {
+        // decimal
+        return atoi(in);
+    }
+}
+
 int main(int argc, char **argv) {
     int opt;
     char const *cmd = argv[0];
@@ -166,8 +197,9 @@ int main(int argc, char **argv) {
     FILE *file_in = NULL;
     output = stdout;
     input = stdin;
+    unsigned first_pc = 0;
 
-    while ((opt = getopt(argc, argv, "bcdli:o:u")) != -1) {
+    while ((opt = getopt(argc, argv, "bcdli:o:ua:")) != -1) {
         switch (opt) {
         case 'b':
             options.bin_mode = true;
@@ -189,6 +221,9 @@ int main(int argc, char **argv) {
             break;
         case 'o':
             options.filename_out = optarg;
+            break;
+        case 'a':
+            first_pc = do_parse_int(optarg);
             break;
         default:
             print_usage(cmd);
@@ -213,7 +248,7 @@ int main(int argc, char **argv) {
     sh4asm_set_error_handler(on_err);
 
     if (options.disas)
-        do_disasm();
+        do_disasm(first_pc);
     else
         do_asm();
 
